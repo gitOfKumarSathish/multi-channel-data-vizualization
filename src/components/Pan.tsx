@@ -2,6 +2,7 @@ import HighchartsReact from 'highcharts-react-official';
 import Highcharts from 'highcharts';
 import { useEffect, useRef, useState } from 'react';
 import * as API from './API/API';
+import { limit } from './Config';
 
 const initialOptions = {
     chart: {
@@ -17,7 +18,7 @@ const initialOptions = {
         type: "line",
         animation: Highcharts.svg, // don't animate in old IE
         marginRight: 10,
-        zoomType: "xy",
+        zoomType: "x",
         panning: true,
         panKey: 'shift'
     },
@@ -26,7 +27,7 @@ const initialOptions = {
     },
     xAxis: {
         // type: "datetime",
-        tickPixelInterval: 100,
+        tickPixelInterval: 10,
     },
     yAxis: {
         type: 'logarithmic',
@@ -71,10 +72,11 @@ const PanChart = () => {
     const [start, setStart] = useState(0);
 
     const fetchData = async () => {
-        const response = await API.getFuncNodes();
-        const newData = response.data.slice(start, start + 10);
-        setStart(start + 20);
-        setData([...data, ...newData]);
+        const newStart = start + limit;
+        const response = await API.getFuncNodes(newStart);
+        const newData = response.data.slice(start, newStart);
+        setStart(newStart);
+        setData((prevData: any) => [...prevData, ...newData]);
     };
 
     useEffect(() => {
@@ -92,13 +94,30 @@ const PanChart = () => {
         fetchData();
     };
 
+    // const handleRedraw = () => {
+    //     const chart = chartRef.current?.chart;
+    //     console.log('charter');
+    //     if (chart && chart.isInsidePlot(chart.pointer.chartX - chart.plotLeft, chart.pointer.chartY - chart.plotTop)) {
+    //         // console.log('object');
+    //         fetchData();
+    //     }
+    //     // chart?.on('pan', fetchData);
+    //     chart?.current?.on('pan', () => {
+    //         console.log('print', chart);
+
+    //         // Do something when the chart is clicked
+    //     });
+    // };
+
     const handleRedraw = () => {
         const chart = chartRef.current?.chart;
-        console.log('chart && chart.isInsidePlot(chart.pointer.chartX - chart.plotLeft, chart.pointer.chartY - chart.plotTop', chart.isInsidePlot(chart.pointer.chartX - chart.plotLeft, chart.pointer.chartY - chart.plotTop));
-        if (chart && chart.isInsidePlot(chart.pointer.chartX - chart.plotLeft, chart.pointer.chartY - chart.plotTop)) {
-            console.log('object');
-            fetchData();
-        }
+        chart?.current?.on('pan', (event) => {
+            const { chartX, chartY } = event;
+            const isInsidePlot = chart.isInsidePlot(chartX - chart.plotLeft, chartY - chart.plotTop);
+            if (isInsidePlot) {
+                fetchData();
+            }
+        });
     };
 
     useEffect(() => {

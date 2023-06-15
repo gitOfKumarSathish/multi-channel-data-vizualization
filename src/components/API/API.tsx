@@ -1,7 +1,9 @@
 import axios from 'axios';
+import { limit } from '../Config';
 
 const ApiUrl = {
-    getFuncNodes: "https://mocki.io/v1/58e86430-5d39-4c67-bce1-7676da89bdba",
+    // getFuncNodes: "https://mocki.io/v1/58e86430-5d39-4c67-bce1-7676da89bdba",
+    getFuncNodes: "http://localhost:3000/data"
 };
 
 
@@ -15,8 +17,8 @@ async function PostMethod(url: string, data: any) {
     return response.data;
 }
 
-export function getFuncNodes() {
-    let url = ApiUrl.getFuncNodes;
+export function getFuncNodes(limits: number = limit) {
+    let url = ApiUrl.getFuncNodes + `?limit=${limits}`;
     return GetMethod(url);
 }
 

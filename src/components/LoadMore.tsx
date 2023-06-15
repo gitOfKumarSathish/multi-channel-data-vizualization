@@ -2,6 +2,9 @@ import HighchartsReact from 'highcharts-react-official';
 import Highcharts from 'highcharts';
 import { useEffect, useRef, useState } from 'react';
 import * as API from './API/API';
+import { PythonData } from '../assets/data';
+import { limit } from './Config';
+// import PythonData from './../assets/data.json';
 
 const initialOptions = {
     chart: {
@@ -67,12 +70,21 @@ const LoadMore = () => {
     const [data, setData] = useState<any>([]);
     const [start, setStart] = useState(0);
 
+    // const fetchData = async () => {
+    //     const response = await API.getFuncNodes(start + limit);
+    //     const newData = response.data.slice(start, start + limit);
+    //     setStart(start + limit);
+    //     setData([...data, ...newData]);
+    // };
+
     const fetchData = async () => {
-        const response = await API.getFuncNodes();
-        const newData = response.data.slice(start, start + 20);
-        setStart(start + 20);
-        setData([...data, ...newData]);
+        const newStart = start + limit;
+        const response = await API.getFuncNodes(newStart);
+        const newData = response.data.slice(start, newStart);
+        setStart(newStart);
+        setData((prevData: any) => [...prevData, ...newData]);
     };
+
 
     useEffect(() => {
         fetchData();
