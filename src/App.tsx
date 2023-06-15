@@ -8,7 +8,7 @@ function App() {
   return (
     <>
       {/* <LineChart /> */}
-      <PanChart />
+      {/* <PanChart /> */}
       <LoadMore />
     </>
   );
