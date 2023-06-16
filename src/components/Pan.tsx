@@ -3,7 +3,8 @@ import axios from 'axios';
 import Highcharts from 'highcharts';
 import HighchartsReact from 'highcharts-react-official';
 import { limit } from './Config';
-
+let previousMin = 0;
+let previousMax = 0;
 const PanChart = () => {
     const chartRef = useRef<any>(null);
     const [data, setData] = useState<any>([]);
@@ -17,13 +18,34 @@ const PanChart = () => {
         const chart = chartRef.current?.chart;
         const xAxis = e.target.xAxis;
         console.log('X axis', xAxis);
-        if (
-            xAxis[0].min !== chart.options.xAxis[0].min ||
-            xAxis[0].max !== chart.options.xAxis[0].max
-        ) {
-            // setXAxesValues({ xAxisMin: xAxis[0]?.dataMin, xAxisMax: xAxis[0]?.dataMax });
+        console.log('chart.options', chart.options);
+
+        console.log('xAxis[0].min => ', xAxis[0].min, 'chartOption =>', previousMin);
+        console.log('xAxis[0].max => ', xAxis[0].max, 'chartOption =>', previousMax);
+
+        if (xAxis[0].min > previousMin || xAxis[0].max > previousMax) {
+            previousMin = xAxis[0].min;
+            previousMax = xAxis[0].max;
             setXAxesValues({ xAxisMin: 0, xAxisMax: xAxesValues.xAxisMax + 1000 });
         }
+        // if (
+        //     xAxis[0].min !== chart.options.xAxis[0].min ||
+        //     xAxis[0].max !== chart.options.xAxis[0].max
+        // ) {
+
+        //     // setXAxesValues({ xAxisMin: xAxis[0]?.dataMin, xAxisMax: xAxis[0]?.dataMax });
+        //     setXAxesValues({ xAxisMin: 0, xAxisMax: xAxesValues.xAxisMax + 1000 });
+        // } else {
+        //     // Zoom reset event
+        //     const currentData = chart.series[0].options.data;
+        //     // setVisibleData(currentData.slice(-5000));
+        //     console.log('currentData', currentData);
+        //     setXAxesValues({ xAxisMin: 0, xAxisMax: xAxesValues.xAxisMax + 1000 });
+        // }
+    };
+
+    const setResetData = () => {
+        console.log('xAxesValues', xAxesValues);
     };
 
     useEffect(() => {
@@ -47,12 +69,16 @@ const PanChart = () => {
 
     useEffect(() => {
         const chart = chartRef.current?.chart;
-        console.log('data', data);
-        console.log('visibleData', visibleData);
+        // console.log('data', data);
+        // console.log('visibleData', visibleData);
         // const oo = data.splice(0, visibleData.length);
         // console.log('00', oo);
         if (chart) {
+            // const startIndex = Math.max(0, data.length - 110);
+            // const latestData = data.splice(startIndex);
+            // chart.update({ series: [{ data: latestData }] });
             chart.update({ series: [{ data: data.splice(0, data.length - 0) }] });
+            // chart.update({ series: [{ data: data.slice(-5000) }] });
         }
     }, [visibleData]);
 
@@ -70,6 +96,12 @@ const PanChart = () => {
                         panning: true,
                         events: {
                             pan: handleChartPan,
+                            selection: function (event) {
+                                if (event.resetSelection) {
+                                    console.log('resetSelection');
+                                    setResetData();
+                                }
+                            }
                         },
                     },
                     title: {
