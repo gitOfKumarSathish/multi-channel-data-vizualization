@@ -17,8 +17,8 @@ const PanChart = () => {
     const handleChartPan = (e: { target: { xAxis: any; }; }) => {
         const chart = chartRef.current?.chart;
         const xAxis = e.target.xAxis;
-        console.log('X axis', xAxis);
-        console.log('chart.options', chart.options);
+        // console.log('X axis', xAxis);
+        // console.log('chart.options', chart.options);
 
         console.log('xAxis[0].min => ', xAxis[0].min, 'chartOption =>', previousMin);
         console.log('xAxis[0].max => ', xAxis[0].max, 'chartOption =>', previousMax);
@@ -26,26 +26,13 @@ const PanChart = () => {
         if (xAxis[0].min > previousMin || xAxis[0].max > previousMax) {
             previousMin = xAxis[0].min;
             previousMax = xAxis[0].max;
-            setXAxesValues({ xAxisMin: 0, xAxisMax: xAxesValues.xAxisMax + 1000 });
+            setXAxesValues({ xAxisMin: xAxesValues.xAxisMax, xAxisMax: xAxesValues.xAxisMax + limit });
         }
-        // if (
-        //     xAxis[0].min !== chart.options.xAxis[0].min ||
-        //     xAxis[0].max !== chart.options.xAxis[0].max
-        // ) {
-
-        //     // setXAxesValues({ xAxisMin: xAxis[0]?.dataMin, xAxisMax: xAxis[0]?.dataMax });
-        //     setXAxesValues({ xAxisMin: 0, xAxisMax: xAxesValues.xAxisMax + 1000 });
-        // } else {
-        //     // Zoom reset event
-        //     const currentData = chart.series[0].options.data;
-        //     // setVisibleData(currentData.slice(-5000));
-        //     console.log('currentData', currentData);
-        //     setXAxesValues({ xAxisMin: 0, xAxisMax: xAxesValues.xAxisMax + 1000 });
-        // }
     };
 
     const setResetData = () => {
         console.log('xAxesValues', xAxesValues);
+        setXAxesValues({ xAxisMin: xAxesValues.xAxisMax, xAxisMax: xAxesValues.xAxisMax + limit });
     };
 
     useEffect(() => {
@@ -59,8 +46,8 @@ const PanChart = () => {
         try {
             const response = await axios.get(apiData);
             const newData = response?.data?.data;
-            // setData((prevData: any) => [...prevData, ...newData]);
-            setData(newData);
+            setData((prevData: any) => [...prevData, ...newData]);
+            // setData(newData);
             setVisibleData(newData);
         } catch (error) {
             console.error('Error fetching data:', error);
@@ -74,13 +61,17 @@ const PanChart = () => {
         // const oo = data.splice(0, visibleData.length);
         // console.log('00', oo);
         if (chart) {
-            // const startIndex = Math.max(0, data.length - 110);
+            // const startIndex = Math.max(0, data.length - 5000);
             // const latestData = data.splice(startIndex);
             // chart.update({ series: [{ data: latestData }] });
-            chart.update({ series: [{ data: data.splice(0, data.length - 0) }] });
+            chart.update({ series: [{ data }] });
+
+            // const latest50 = data.slice(data.length - limit);
+            // console.log('latest50', latest50);
+            // chart.update({ series: [{ data: latest50 }] });
             // chart.update({ series: [{ data: data.slice(-5000) }] });
         }
-    }, [visibleData]);
+    }, [data]);
 
     return (
         <div style={{ width: 1000 }}>
