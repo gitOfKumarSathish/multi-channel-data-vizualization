@@ -1,7 +1,7 @@
 import Highcharts from "highcharts";
 import HighchartsReact from "highcharts-react-official";
 import HighchartsMore from "highcharts/highcharts-more";
-import { useRef } from "react";
+import { memo, useRef } from "react";
 
 // Initialize HighchartsMore module
 HighchartsMore(Highcharts);
@@ -75,4 +75,4 @@ const LineChart = () => {
     );
 };
 
-export default LineChart;
+export default memo(LineChart);

@@ -1,6 +1,6 @@
 import HighchartsReact from 'highcharts-react-official';
 import Highcharts from 'highcharts';
-import { useEffect, useRef, useState } from 'react';
+import { memo, useEffect, useRef, useState } from 'react';
 import * as API from './API/API';
 import { PythonData } from '../assets/data';
 import { limit } from './Config';
@@ -117,4 +117,4 @@ const LoadMore = () => {
     );
 };
 
-export default LoadMore;
+export default memo(LoadMore);
