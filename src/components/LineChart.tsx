@@ -45,8 +45,7 @@ const options = {
 };
 
 const LineChart = () => {
-    const chartRef = useRef(null);
-
+    const chartRef = useRef<HighchartsReact.Props>(null);
     const handleAfterSetExtremes = (e: any) => {
         const chart = chartRef.current.chart;
         if (e.trigger !== "syncExtremes") {

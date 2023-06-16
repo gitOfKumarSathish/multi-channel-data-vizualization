@@ -7,7 +7,7 @@ import * as API from './API/API';
 // Initialize HighchartsMore module
 xrange(Highcharts);
 const XseriesAnnotation = () => {
-    const chartRef = useRef(null);
+    const chartRef = useRef<HighchartsReact.Props>(null);
     const [data, setData] = useState<any>([]);
 
     const options = {
@@ -29,7 +29,7 @@ const XseriesAnnotation = () => {
             reversed: false
         },
         tooltip: {
-            formatter(): string {
+            formatter(this: any): string {
                 return `<b>${this.x.toFixed(2) + ' - ' + this.x2.toFixed(2)}</b><br/><b>${this.yCategory}</b>`;
             },
         },
@@ -50,7 +50,7 @@ const XseriesAnnotation = () => {
                     fontSize: '14px',
                     fontWeight: 'bold',
                 },
-                formatter(): string {
+                formatter(this: any): string {
                     return this.point.title;
                 },
             },
@@ -71,16 +71,19 @@ const XseriesAnnotation = () => {
     useEffect(() => {
         const chart = chartRef.current?.chart;
         if (chart) {
+
+            const chartCategory = data.map((plot: { data: { tag: any; }; }) => plot.data.tag);
+            const uniqueArray = [...new Set(chartCategory)];
+            console.log('uniqueArray', uniqueArray);
+
             const chartData = data.map((plot: { data: { bt: any; tt: any; tag: string; }; }) => ({
                 x: plot.data.bt,
                 x2: plot.data.tt,
-                y: plot.data.tag === 'normal' ? 0 : 1,
+                y: uniqueArray.indexOf(plot.data.tag),
                 title: plot.data.tag,
                 // color:plot.data.tag === 'normal' ? 'green' : 'red',
             }));
 
-            const chartCategory = data.map((plot: { data: { tag: any; }; }) => plot.data.tag);
-            const uniqueArray = [...new Set(chartCategory)];
 
             chart.update({
                 series: [{ data: chartData }],

@@ -1,6 +1,6 @@
 import HighchartsReact from 'highcharts-react-official';
 import Highcharts from 'highcharts';
-import { useEffect, useRef, useState } from 'react';
+import { memo, useEffect, useRef, useState } from 'react';
 import * as API from './API/API';
 import { limit } from './Config';
 
@@ -16,7 +16,7 @@ const initialOptions = {
         //     }
         // },
         type: "line",
-        animation: Highcharts.svg, // don't animate in old IE
+        // animation: Highcharts.svg, // don't animate in old IE
         marginRight: 10,
         zoomType: "x",
         panning: true,
@@ -43,7 +43,7 @@ const initialOptions = {
         ],
     },
     tooltip: {
-        formatter(): string {
+        formatter(this: any): string {
             return `<b>${Highcharts.dateFormat("%Y-%m-%d %H:%M:%S", this.x)}</b><br/><b>${this.y}</b>`;
         },
     },
@@ -65,7 +65,7 @@ const initialOptions = {
 };
 
 const PanChart = () => {
-    const chartRef = useRef<Highcharts.Chart | null>(null);
+    const chartRef = useRef<HighchartsReact.Props>(null);
     const [options, setOptions] = useState<any>(initialOptions);
 
     const [data, setData] = useState<any>([]);
@@ -78,6 +78,7 @@ const PanChart = () => {
         setStart(newStart);
         setData((prevData: any) => [...prevData, ...newData]);
     };
+
 
     useEffect(() => {
         fetchData();
@@ -110,8 +111,9 @@ const PanChart = () => {
     // };
 
     const handleRedraw = () => {
+        // console.log('object');
         const chart = chartRef.current?.chart;
-        chart?.current?.on('pan', (event) => {
+        chart?.current?.on('pan', (event: { chartX: any; chartY: any; }) => {
             const { chartX, chartY } = event;
             const isInsidePlot = chart.isInsidePlot(chartX - chart.plotLeft, chartY - chart.plotTop);
             if (isInsidePlot) {
@@ -122,9 +124,9 @@ const PanChart = () => {
 
     useEffect(() => {
         const chart = chartRef.current?.chart;
-        console.log('chart', chart);
+        // console.log('chart', chart);
         if (chart) {
-            console.log('update');
+            // console.log('update');
 
             chart.update({
                 chart: {
@@ -152,4 +154,4 @@ const PanChart = () => {
     );
 };
 
-export default PanChart;
+export default memo(PanChart);

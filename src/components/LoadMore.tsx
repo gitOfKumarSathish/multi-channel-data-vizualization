@@ -18,7 +18,7 @@ const initialOptions = {
         //     }
         // },
         type: "line",
-        animation: Highcharts.svg, // don't animate in old IE
+        // animation: Highcharts.svg, // don't animate in old IE
         marginRight: 10,
         zoomType: "xy",
         panning: true,
@@ -45,7 +45,7 @@ const initialOptions = {
         ],
     },
     tooltip: {
-        formatter(): string {
+        formatter(this: any): string {
             return `<b>${Highcharts.dateFormat("%Y-%m-%d %H:%M:%S", this.x)}</b><br/><b>${this.y}</b>`;
         },
     },
@@ -64,7 +64,7 @@ const initialOptions = {
 };
 
 const LoadMore = () => {
-    const chartRef = useRef<Highcharts.Chart | null>(null);
+    const chartRef = useRef<HighchartsReact.Props>(null);
     const [options, setOptions] = useState<any>(initialOptions);
 
     const [data, setData] = useState<any>([]);
