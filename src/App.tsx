@@ -10,8 +10,8 @@ function App() {
     <>
       {/* <LineChart /> */}
       <PanChart />
-      <LoadMore />
-      <XseriesAnnotation />
+      {/* <LoadMore /> */}
+      {/* <XseriesAnnotation /> */}
     </>
   );
 }
