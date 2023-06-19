@@ -6,6 +6,8 @@ const ApiUrl = {
     getFuncNodes: "http://localhost:3000/data",
     getAnnotations: "http://localhost:3000/annotation",
     getVolumes: "http://localhost:3000/volume",
+    viewConfig: "http://localhost:3000/viewConfig",
+
 };
 
 
@@ -31,6 +33,11 @@ export function getAnnotations() {
 
 export function getVolumes() {
     let url = ApiUrl.getVolumes;
+    return GetMethod(url);
+}
+
+export function viewConfig() {
+    let url = ApiUrl.viewConfig;
     return GetMethod(url);
 }
 

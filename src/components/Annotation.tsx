@@ -6,30 +6,31 @@ import * as API from './API/API';
 
 // Initialize HighchartsMore module
 xrange(Highcharts);
-const Annotation = () => {
+const Annotation = (props: any) => {
+    const { channel, chart_type, x_label, y_label } = props.configs;
     const chartRef = useRef<HighchartsReact.Props>(null);
     const [data, setData] = useState<any>([]);
 
     const options = {
         chart: {
-            type: 'xrange',
+            type: String(chart_type),
             zoomType: 'x',
             panKey: 'shift',
             panning: true,
         },
         title: {
-            text: 'Highcharts X-range'
+            text: String(channel)
         },
 
         xAxis: {
             // type: 'datetime',
             title: {
-                text: 'ts'
+                text: String(x_label)
             },
         },
         yAxis: {
             title: {
-                text: 'tag'
+                text: String(y_label)
             },
             categories: [],
             reversed: false
@@ -43,7 +44,7 @@ const Annotation = () => {
             enabled: false, // Disable legends
         },
         series: [{
-            name: 'annot Type',
+            name: { channel },
             pointPadding: 1,
             groupPadding: 1,
             borderColor: 'gray',
@@ -63,12 +64,13 @@ const Annotation = () => {
         }]
 
     };
-    // console.log('dta', options.series);
+
     useEffect(() => {
         if (chartRef.current) {
             chartRef.current.chart.reflow();
         }
     }, []);
+
     const fetchData = async () => {
         const response = await API.getAnnotations();
         setData(response.data);

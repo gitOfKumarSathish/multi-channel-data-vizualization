@@ -4,16 +4,18 @@ import LineChart from './components/LineChart';
 import LoadMore from './components/LoadMore';
 import PanChart from './components/Pan';
 import Annotation from './components/Annotation';
+import Charts from './components/Charts';
 
 function App() {
 
   return (
     <>
+      <Charts />
       {/* <LineChart /> */}
-      <Channel2 />
-      <PanChart />
-      <LoadMore />
-      <Annotation />
+      {/* <Channel2 /> */}
+      {/* <PanChart /> */}
+      {/* <LoadMore /> */}
+      {/* <Annotation /> */}
     </>
   );
 }
