@@ -11,7 +11,7 @@ function App() {
       {/* <LineChart /> */}
       <PanChart />
       {/* <LoadMore /> */}
-      {/* <XseriesAnnotation /> */}
+      <XseriesAnnotation />
     </>
   );
 }

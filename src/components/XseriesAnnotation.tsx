@@ -12,18 +12,24 @@ const XseriesAnnotation = () => {
 
     const options = {
         chart: {
-            type: 'xrange'
+            type: 'xrange',
+            zoomType: 'x',
+            panKey: 'shift',
+            panning: true,
         },
         title: {
             text: 'Highcharts X-range'
         },
 
         xAxis: {
-            // type: 'datetime'
+            // type: 'datetime',
+            title: {
+                text: 'ts'
+            },
         },
         yAxis: {
             title: {
-                text: ''
+                text: 'tag'
             },
             categories: [],
             reversed: false
@@ -51,7 +57,7 @@ const XseriesAnnotation = () => {
                     fontWeight: 'bold',
                 },
                 formatter(this: any): string {
-                    return this.point.title;
+                    return this.point?.title;
                 },
             },
         }]
@@ -70,21 +76,18 @@ const XseriesAnnotation = () => {
 
     useEffect(() => {
         const chart = chartRef.current?.chart;
-        if (chart) {
-
-            const chartCategory = data.map((plot: { data: { tag: any; }; }) => plot.data.tag);
+        if (chart && data) {
+            const dataFromAPI = data[0]?.data;
+            const chartCategory = dataFromAPI?.map((plot: { tag: any; }) => plot.tag);
             const uniqueArray = [...new Set(chartCategory)];
-            console.log('uniqueArray', uniqueArray);
 
-            const chartData = data.map((plot: { data: { bt: any; tt: any; tag: string; }; }) => ({
-                x: plot.data.bt,
-                x2: plot.data.tt,
-                y: uniqueArray.indexOf(plot.data.tag),
-                title: plot.data.tag,
+            const chartData = dataFromAPI?.map((plot: { bt: any; tt: any; tag: string; }) => ({
+                x: plot.bt,
+                x2: plot.tt,
+                y: uniqueArray.indexOf(plot.tag),
+                title: plot.tag,
                 // color:plot.data.tag === 'normal' ? 'green' : 'red',
             }));
-
-
             chart.update({
                 series: [{ data: chartData }],
                 yAxis: [{ categories: uniqueArray }],
@@ -97,7 +100,7 @@ const XseriesAnnotation = () => {
     }, []);
 
     return (
-        <div>
+        <div style={{ width: 1000 }}>
             <HighchartsReact highcharts={Highcharts} options={options} ref={chartRef} />
         </div>
     );
