@@ -6,7 +6,7 @@ import * as API from './API/API';
 
 // Initialize HighchartsMore module
 xrange(Highcharts);
-const XseriesAnnotation = () => {
+const Annotation = () => {
     const chartRef = useRef<HighchartsReact.Props>(null);
     const [data, setData] = useState<any>([]);
 
@@ -106,4 +106,4 @@ const XseriesAnnotation = () => {
     );
 };
 
-export default memo(XseriesAnnotation);
+export default memo(Annotation);
