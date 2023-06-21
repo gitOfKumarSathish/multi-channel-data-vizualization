@@ -45,7 +45,6 @@ export function viewConfig() {
 
 export function getData(channel: string) {
     let url = `${ApiUrl.baseURl + '/' + channel}`;
-    console.log('url: ' + url);
     return GetMethod(url);
 }
 

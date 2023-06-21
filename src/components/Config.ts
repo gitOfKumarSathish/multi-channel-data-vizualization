@@ -28,21 +28,50 @@ const dataMappingForBasicChart = (data: any, chart: any) => {
 
 
 const dataMappingForAnnotation = (data: any, chart: any) => {
-    const dataFromAPI = data[0]?.data;
-    const chartCategory = dataFromAPI?.map((plot: { tag: any; }) => plot.tag);
-    const uniqueArray = [...new Set(chartCategory)];
+    console.log('data', data);
+    // const dataFromAPI = data[0]?.data;
+    const multiChannelData: { name: string; data: any; }[] = [];
+    let uniqueArray: string | unknown[];
 
-    const chartData = dataFromAPI?.map((plot: { bt: any; tt: any; tag: string; }) => ({
-        x: plot.bt,
-        x2: plot.tt,
-        y: uniqueArray.indexOf(plot.tag),
-        title: plot.tag,
-        // color:plot.data.tag === 'normal' ? 'green' : 'red',
-    }));
+    // data.push({
+    //     channel: 'leannot',
+    //     data: [{ tag: 'normal', bt: 10.05457323101686793, tt: 11.376169333269855 },
+    //     { tag: 'normal', bt: 12.5145977131359087, tt: 12.4276800061833184 },
+    //     { tag: 'normal', bt: 31.4057923595428816, tt: 15.069662850463297 },
+
+    //     { tag: 'abnormal', bt: 12.2744177379412935, tt: 12.5513640419571972 },
+
+    //     { tag: 'abnormal', bt: 12.688017159514625, tt: 12.9630646171113795 },
+
+    //     { tag: 'abnormal', bt: 13.949485328732452, tt: 14.686925802766769 }
+    //     ]
+    // });
+    // console.log('datadatadata', data);
+    data.map((singleChannelData: { data: any; }) => {
+        const dataFromAPI = singleChannelData?.data;
+        const chartCategory = dataFromAPI?.map((plot: { tag: any; }) => plot.tag);
+        uniqueArray = [...new Set(chartCategory)];
+
+        const chartData = dataFromAPI?.map((plot: { bt: any; tt: any; tag: string; }) => ({
+            x: plot.bt,
+            x2: plot.tt,
+            y: uniqueArray.indexOf(plot.tag),
+            title: plot.tag,
+        }));
+
+        multiChannelData.push({
+            name: 'chartCategory',
+            data: chartData
+        });
+
+    });
+
     chart.update({
-        series: [{ data: chartData }],
+        series: multiChannelData,
         yAxis: [{ categories: uniqueArray }],
     });
+
+
 };
 
 

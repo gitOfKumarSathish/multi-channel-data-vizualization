@@ -62,7 +62,11 @@ const Annotation = (props: any) => {
                     return this.point?.title;
                 },
             },
-        }]
+        },
+        {
+            data: []
+        }
+        ]
 
     };
 
