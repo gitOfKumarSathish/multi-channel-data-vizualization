@@ -3,6 +3,7 @@ import Highcharts from "highcharts";
 import HighchartsReact from "highcharts-react-official";
 import xrange from "highcharts/modules/xrange";
 import * as API from './API/API';
+import { dataMappingForAnnotation } from "./Config";
 
 // Initialize HighchartsMore module
 xrange(Highcharts);
@@ -79,21 +80,7 @@ const Annotation = (props: any) => {
     useEffect(() => {
         const chart = chartRef.current?.chart;
         if (chart && data) {
-            const dataFromAPI = data[0]?.data;
-            const chartCategory = dataFromAPI?.map((plot: { tag: any; }) => plot.tag);
-            const uniqueArray = [...new Set(chartCategory)];
-
-            const chartData = dataFromAPI?.map((plot: { bt: any; tt: any; tag: string; }) => ({
-                x: plot.bt,
-                x2: plot.tt,
-                y: uniqueArray.indexOf(plot.tag),
-                title: plot.tag,
-                // color:plot.data.tag === 'normal' ? 'green' : 'red',
-            }));
-            chart.update({
-                series: [{ data: chartData }],
-                yAxis: [{ categories: uniqueArray }],
-            });
+            dataMappingForAnnotation(data, chart);
         }
     }, [data]);
 

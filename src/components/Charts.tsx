@@ -16,36 +16,34 @@ export default function Charts() {
         setViewConfigs(response.data);
     };
 
+    // const chartChannel = () => {
+    //     return viewConfigs.map((viewConfig: { src_channels?: any; chart_type?: any; x_label?: any; y_label?: any; chart?: any; }, index: number) => {
+    //         const { chart_type } = viewConfig;
+
+    //         switch (chart_type) {
+    //             case 'line':
+    //             case 'bar':
+    //             case 'column':
+    //                 return <Channel2 key={index} configs={viewConfig} />;
+    //             case 'xrange':
+    //                 return <Annotation key={index} configs={viewConfig} />;
+    //             default:
+    //                 break;
+    //         }
+    //     });
+    // };
+
     const chartChannel = () => {
-        return viewConfigs.map((viewConfig, index: number) => {
-            // const { channel } = viewConfig?.src_channels[0];
-
+        return viewConfigs.map((viewConfig: { src_channels?: any; chart_type?: any; x_label?: any; y_label?: any; chart?: any; }, index: number) => {
             const { chart_type } = viewConfig;
-            // const { chart_type } = viewConfig?.src_channels;
 
-            // viewConfig?.src_channels.map(x => {
-            //     console.log('x', x);
-            // });
-            console.log('viewConfig?.src_channels', viewConfig?.src_channels);
-            console.log('chart_type', chart_type);
-
-            switch (chart_type) {
-                case ('line' || 'bar'):
-                    return <Channel2 key={index} configs={viewConfig} />;
-                case ('xrange'):
-                    return <Annotation key={index} configs={viewConfig} />;
-                default:
-                    break;
+            if (['line', 'bar', 'column'].includes(chart_type)) {
+                return <Channel2 key={index} configs={viewConfig} />;
+            } else if (chart_type === 'xrange') {
+                return <Annotation key={index} configs={viewConfig} />;
+            } else {
+                return null; // or handle the default case accordingly
             }
-            // switch (channel) {
-            //     case 'volume':
-            //         return <Channel2 key={index} configs={viewConfig?.src_channels[0]} />;
-            //     case "annotation":
-            //         // return <Annotation key={index} channel={channel} chartType={chart_type} x_label={x_label} y_label={y_label} />;
-            //         return <Annotation key={index} configs={viewConfig?.src_channels[0]} />;
-            //     default:
-            //         break;
-            // }
         });
     };
 

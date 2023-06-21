@@ -7,6 +7,7 @@ const ApiUrl = {
     getAnnotations: "http://localhost:3000/annotation",
     getVolumes: "http://localhost:3000/volume",
     viewConfig: "http://localhost:3000/viewConfig",
+    baseURl: "http://localhost:3000"
 
 };
 
@@ -38,6 +39,13 @@ export function getVolumes() {
 
 export function viewConfig() {
     let url = ApiUrl.viewConfig;
+    return GetMethod(url);
+}
+
+
+export function getData(channel: string) {
+    let url = `${ApiUrl.baseURl + '/' + channel}`;
+    console.log('url: ' + url);
     return GetMethod(url);
 }
 
