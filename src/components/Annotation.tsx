@@ -7,7 +7,7 @@ import * as API from './API/API';
 // Initialize HighchartsMore module
 xrange(Highcharts);
 const Annotation = (props: any) => {
-    const { channel, chart_type, x_label, y_label } = props.configs;
+    const { chart, chart_type, x_label, y_label } = props.configs;
     const chartRef = useRef<HighchartsReact.Props>(null);
     const [data, setData] = useState<any>([]);
 
@@ -19,7 +19,7 @@ const Annotation = (props: any) => {
             panning: true,
         },
         title: {
-            text: String(channel)
+            text: String(chart)
         },
 
         xAxis: {
@@ -44,7 +44,7 @@ const Annotation = (props: any) => {
             enabled: false, // Disable legends
         },
         series: [{
-            name: { channel },
+            name: { chart },
             pointPadding: 1,
             groupPadding: 1,
             borderColor: 'gray',

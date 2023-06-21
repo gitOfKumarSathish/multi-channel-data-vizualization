@@ -17,18 +17,35 @@ export default function Charts() {
     };
 
     const chartChannel = () => {
-        return viewConfigs.map((viewConfig: { src_channels: { channel: any, chart_type: any, x_label: any, y_label: any; }[]; }, index: number) => {
-            const { channel } = viewConfig?.src_channels[0];
+        return viewConfigs.map((viewConfig, index: number) => {
+            // const { channel } = viewConfig?.src_channels[0];
 
-            switch (channel) {
-                case 'volume':
-                    return <Channel2 key={index} configs={viewConfig?.src_channels[0]} />;
-                case "annotation":
-                    // return <Annotation key={index} channel={channel} chartType={chart_type} x_label={x_label} y_label={y_label} />;
-                    return <Annotation key={index} configs={viewConfig?.src_channels[0]} />;
+            const { chart_type } = viewConfig;
+            // const { chart_type } = viewConfig?.src_channels;
+
+            // viewConfig?.src_channels.map(x => {
+            //     console.log('x', x);
+            // });
+            console.log('viewConfig?.src_channels', viewConfig?.src_channels);
+            console.log('chart_type', chart_type);
+
+            switch (chart_type) {
+                case ('line' || 'bar'):
+                    return <Channel2 key={index} configs={viewConfig} />;
+                case ('xrange'):
+                    return <Annotation key={index} configs={viewConfig} />;
                 default:
                     break;
             }
+            // switch (channel) {
+            //     case 'volume':
+            //         return <Channel2 key={index} configs={viewConfig?.src_channels[0]} />;
+            //     case "annotation":
+            //         // return <Annotation key={index} channel={channel} chartType={chart_type} x_label={x_label} y_label={y_label} />;
+            //         return <Annotation key={index} configs={viewConfig?.src_channels[0]} />;
+            //     default:
+            //         break;
+            // }
         });
     };
 
@@ -36,7 +53,6 @@ export default function Charts() {
     return (
         <>
 
-            <h1>as</h1>
             {chartChannel()}
 
         </>
