@@ -73,68 +73,69 @@ const PanChart = () => {
         }
     }, [data]);
 
+    const options = {
+        chart: {
+            type: 'line',
+            marginRight: 10,
+            zoomType: 'x',
+            panKey: 'shift',
+            panning: true,
+            events: {
+                pan: handleChartPan,
+                selection: function (event: { resetSelection: any; }) {
+                    if (event.resetSelection) {
+                        console.log('resetSelection');
+                        setResetData();
+                    }
+                }
+            },
+        },
+        title: {
+            text: 'Real-time Time-series Graph',
+        },
+        xAxis: {
+            tickPixelInterval: 100,
+        },
+        yAxis: {
+            type: 'logarithmic',
+            title: {
+                text: 'Value',
+            },
+            plotLines: [
+                {
+                    value: 0,
+                    width: 1,
+                    color: '#808080',
+                },
+            ],
+        },
+        tooltip: {
+            formatter(this: any): string {
+                return `<b>${this.x}</b><br/><b>${this.y}</b>`;
+            },
+        },
+        legend: {
+            enabled: false,
+        },
+        exporting: {
+            enabled: true,
+        },
+        series: [
+            {
+                name: 'Random data',
+                data: data,
+            },
+        ],
+        accessibility: {
+            enabled: false,
+        },
+    };
     return (
         <div style={{ width: 1000 }}>
             <HighchartsReact
                 highcharts={Highcharts}
                 ref={chartRef}
-                options={{
-                    chart: {
-                        type: 'line',
-                        marginRight: 10,
-                        zoomType: 'x',
-                        panKey: 'shift',
-                        panning: true,
-                        events: {
-                            pan: handleChartPan,
-                            selection: function (event) {
-                                if (event.resetSelection) {
-                                    console.log('resetSelection');
-                                    setResetData();
-                                }
-                            }
-                        },
-                    },
-                    title: {
-                        text: 'Real-time Time-series Graph',
-                    },
-                    xAxis: {
-                        tickPixelInterval: 100,
-                    },
-                    yAxis: {
-                        type: 'logarithmic',
-                        title: {
-                            text: 'Value',
-                        },
-                        plotLines: [
-                            {
-                                value: 0,
-                                width: 1,
-                                color: '#808080',
-                            },
-                        ],
-                    },
-                    tooltip: {
-                        formatter(this: any): string {
-                            return `<b>${this.x}</b><br/><b>${this.y}</b>`;
-                        },
-                    },
-                    legend: {
-                        enabled: false,
-                    },
-                    exporting: {
-                        enabled: true,
-                    },
-                    series: [
-                        {
-                            name: 'Random data',
-                            data: data,
-                        },
-                    ],
-                    accessibility: {
-                        enabled: false,
-                    },
-                }}
+                options={options}
             />
         </div>
     );
