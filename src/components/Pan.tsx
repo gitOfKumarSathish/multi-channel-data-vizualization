@@ -3,6 +3,8 @@ import axios from 'axios';
 import Highcharts from 'highcharts';
 import HighchartsReact from 'highcharts-react-official';
 import { limit } from './Config';
+import * as API from './API/API';
+
 let previousMin = 0;
 let previousMax = 0;
 const PanChart = () => {
@@ -30,22 +32,26 @@ const PanChart = () => {
         }
     };
 
-    const setResetData = () => {
-        console.log('xAxesValues', xAxesValues);
-        setXAxesValues({ xAxisMin: xAxesValues.xAxisMax, xAxisMax: xAxesValues.xAxisMax + limit });
-    };
+    // const setResetData = () => {
+    //     console.log('xAxesValues', xAxesValues);
+    //     setXAxesValues({ xAxisMin: xAxesValues.xAxisMax, xAxisMax: xAxesValues.xAxisMax + limit });
+    // };
 
     useEffect(() => {
         fromToFetch(xAxesValues.xAxisMin, xAxesValues.xAxisMax);
     }, [xAxesValues]);
 
+
+
     const fromToFetch = async (min: number, max: number) => {
+        const response = await API.panning(min, max);
         const apiData = `http://localhost:3000/data?from=${Math.ceil(Math.abs(min))}&to=${Math.ceil(
             max
         )}`;
         try {
-            const response = await axios.get(apiData);
-            const newData = response?.data?.data;
+            // const response = await axios.get(apiData);
+            console.log('response', response);
+            const newData = response?.data;
             setData((prevData: any) => [...prevData, ...newData]);
             // setData(newData);
             setVisibleData(newData);
@@ -82,12 +88,12 @@ const PanChart = () => {
             panning: true,
             events: {
                 pan: handleChartPan,
-                selection: function (event: { resetSelection: any; }) {
-                    if (event.resetSelection) {
-                        console.log('resetSelection');
-                        setResetData();
-                    }
-                }
+                // selection: function (event: { resetSelection: any; }) {
+                //     if (event.resetSelection) {
+                //         console.log('resetSelection');
+                //         setResetData();
+                //     }
+                // }
             },
         },
         title: {
@@ -97,7 +103,7 @@ const PanChart = () => {
             tickPixelInterval: 100,
         },
         yAxis: {
-            type: 'logarithmic',
+            // type: 'logarithmic',
             title: {
                 text: 'Value',
             },

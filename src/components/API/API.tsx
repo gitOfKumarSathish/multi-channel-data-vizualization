@@ -2,7 +2,6 @@ import axios from 'axios';
 import { limit } from '../Config';
 
 const ApiUrl = {
-    // getFuncNodes: "https://mocki.io/v1/58e86430-5d39-4c67-bce1-7676da89bdba",
     getFuncNodes: "http://localhost:3000/data",
     getAnnotations: "http://localhost:3000/annotation",
     getVolumes: "http://localhost:3000/volume",
@@ -13,6 +12,7 @@ const ApiUrl = {
 
 
 const GetMethod = async (url: any) => {
+    console.log('finally called', url);
     const response = await axios.get(url);
     return response.data;
 };
@@ -23,28 +23,39 @@ async function PostMethod(url: string, data: any) {
 }
 
 export function getFuncNodes(limits: number = limit) {
-    let url = ApiUrl.getFuncNodes + `?limit=${limits}`;
+    const url = ApiUrl.getFuncNodes + `?limit=${limits}`;
     return GetMethod(url);
 }
 
 export function getAnnotations() {
-    let url = ApiUrl.getAnnotations;
+    const url = ApiUrl.getAnnotations;
     return GetMethod(url);
 }
 
 export function getVolumes() {
-    let url = ApiUrl.getVolumes;
+    const url = ApiUrl.getVolumes;
     return GetMethod(url);
 }
 
 export function viewConfig() {
-    let url = ApiUrl.viewConfig;
+    const url = ApiUrl.viewConfig;
     return GetMethod(url);
 }
 
 
 export function getData(channel: string) {
-    let url = `${ApiUrl.baseURl + '/' + channel}`;
+    const url = `${ApiUrl.baseURl + '/' + channel}`;
     return GetMethod(url);
 }
 
+
+export function panning(min: number, max: number) {
+    // const url = ApiUrl;
+    const cc = `${ApiUrl.getFuncNodes + '?from=' + Math.ceil(Math.abs(min)) + '&to=' + Math.ceil(Math.abs(max))}`;
+
+    console.log('cc', cc);
+    // const surl = `http://localhost:3000/data?from=${Math.ceil(Math.abs(min))}&to=${Math.ceil(
+    //     max
+    // )}`
+    return GetMethod(cc);
+}

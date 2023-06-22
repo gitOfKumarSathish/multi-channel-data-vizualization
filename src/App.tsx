@@ -13,7 +13,7 @@ function App() {
       <Charts />
       {/* <LineChart /> */}
       {/* <Channel2 /> */}
-      {/* <PanChart /> */}
+      <PanChart />
       {/* <LoadMore /> */}
       {/* <Annotation /> */}
     </>
