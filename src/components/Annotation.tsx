@@ -41,6 +41,9 @@ const Annotation = (props: any) => {
                 return `<b>${this.x.toFixed(2) + ' - ' + this.x2.toFixed(2)}</b><br/><b>${this.yCategory}</b>`;
             },
         },
+        credits: {
+            enabled: false
+        },
         legend: {
             enabled: false, // Disable legends
         },

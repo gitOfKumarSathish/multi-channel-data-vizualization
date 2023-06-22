@@ -39,6 +39,9 @@ const Channel2 = (props: any) => {
             },
             reversed: false
         },
+        credits: {
+            enabled: false
+        },
         tooltip: {
             shared: true,
             crosshair: true,
