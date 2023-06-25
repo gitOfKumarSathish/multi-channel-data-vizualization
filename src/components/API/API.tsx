@@ -12,7 +12,7 @@ const ApiUrl = {
 
 
 const GetMethod = async (url: any) => {
-    console.log('finally called', url);
+    // console.log('finally called', url);
     const response = await axios.get(url);
     return response.data;
 };
@@ -46,6 +46,18 @@ export function viewConfig() {
 export function getData(channel: string) {
     const url = `${ApiUrl.baseURl + '/' + channel}`;
     return GetMethod(url);
+}
+
+
+export function Annotpanning(min: number, max: number) {
+    // const url = ApiUrl;
+    const cc = `${ApiUrl.getAnnotations + '?from=' + Math.ceil(Math.abs(min)) + '&to=' + Math.ceil(Math.abs(max))}`;
+
+    console.log('cc', cc);
+    // const surl = `http://localhost:3000/data?from=${Math.ceil(Math.abs(min))}&to=${Math.ceil(
+    //     max
+    // )}`
+    return GetMethod(cc);
 }
 
 

@@ -69,7 +69,7 @@ const Channel2 = (props: any) => {
     };
 
     useEffect(() => {
-        console.log('data', data);
+        // console.log('data', data);
         const chart = chartRef.current?.chart;
         if (chart && data) {
             dataMappingForBasicChart(data, chart);
@@ -83,7 +83,8 @@ const Channel2 = (props: any) => {
     }, []);
 
     return (
-        <div style={{ width: '1000px' }}>
+        // <div style={{ width: 1000 }}>
+        <div>
             <HighchartsReact highcharts={Highcharts} options={options} ref={chartRef} />
         </div>
 

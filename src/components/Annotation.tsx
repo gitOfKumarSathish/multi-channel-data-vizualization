@@ -3,7 +3,7 @@ import Highcharts from "highcharts";
 import HighchartsReact from "highcharts-react-official";
 import xrange from "highcharts/modules/xrange";
 import * as API from './API/API';
-import { dataMappingForAnnotation, limit } from "./Config";
+import { dataMappingForAnnotation, limitForAnnotation } from "./Config";
 
 // Initialize HighchartsMore module
 xrange(Highcharts);
@@ -17,22 +17,24 @@ const Annotation = (props: any) => {
     const [data, setData] = useState<any>([]);
     const [xAxesValues, setXAxesValues] = useState<{ xAxisMin: number; xAxisMax: number; }>({
         xAxisMin: 0,
-        xAxisMax: limit,
+        xAxisMax: limitForAnnotation,
     });
 
     const handleChartPan = (e: { target: { xAxis: any; }; }) => {
         const chart = chartRef.current?.chart;
         const xAxis = e.target.xAxis;
         console.log('X axis', xAxis);
-        // console.log('chart.options', chart.options);
+        console.log('chart.options', chart.options);
 
         console.log('xAxis[0].min => ', xAxis[0].min, 'chartOption =>', previousMin);
         console.log('xAxis[0].max => ', xAxis[0].max, 'chartOption =>', previousMax);
 
         if (xAxis[0].min > previousMin || xAxis[0].max > previousMax) {
+
+            console.log('Im coming');
             previousMin = xAxis[0].min;
             previousMax = xAxis[0].max;
-            setXAxesValues({ xAxisMin: xAxesValues.xAxisMax, xAxisMax: xAxesValues.xAxisMax + limit });
+            setXAxesValues({ xAxisMin: xAxesValues.xAxisMax, xAxisMax: xAxesValues.xAxisMax + limitForAnnotation });
         }
     };
 
@@ -41,14 +43,12 @@ const Annotation = (props: any) => {
     }, [xAxesValues]);
 
     const fromToFetch = async (min: number, max: number) => {
-        const response = await API.panning(min, max);
+        const response = await API.Annotpanning(min, max);
 
         try {
             // const response = await axios.get(apiData);
-            console.log('response', response);
             const newData = response?.data;
             const checking = newData;
-            console.log('checking', checking);
             setData((prevData: any) => [...prevData, ...newData]);
             // setData(newData);
             // setVisibleData(newData);
@@ -56,26 +56,6 @@ const Annotation = (props: any) => {
             console.error('Error fetching data:', error);
         }
     };
-
-    useEffect(() => {
-        const chart = chartRef.current?.chart;
-        // console.log('data', data);
-        // console.log('visibleData', visibleData);
-        // const oo = data.splice(0, visibleData.length);
-        // console.log('00', oo);
-        console.log('data', data);
-        if (chart) {
-            // const startIndex = Math.max(0, data.length - 5000);
-            // const latestData = data.splice(startIndex);
-            // chart.update({ series: [{ data: latestData }] });
-            chart.update({ series: [{ data }] });
-
-            // const latest50 = data.slice(data.length - limit);
-            // console.log('latest50', latest50);
-            // chart.update({ series: [{ data: latest50 }] });
-            // chart.update({ series: [{ data: data.slice(-5000) }] });
-        }
-    }, [data]);
 
     const options = {
         chart: {
@@ -93,6 +73,7 @@ const Annotation = (props: any) => {
 
         xAxis: {
             // type: 'datetime',
+            tickPixelInterval: 100,
             title: {
                 text: String(x_label)
             },
@@ -122,6 +103,28 @@ const Annotation = (props: any) => {
             borderColor: 'gray',
             pointWidth: 20,
             data: [],
+            // data: [{
+            //     x: Date.UTC(2014, 10, 21),
+            //     x2: Date.UTC(2014, 11, 2),
+            //     y: 0,
+            //     partialFill: 0.25
+            // }, {
+            //     x: Date.UTC(2014, 11, 2),
+            //     x2: Date.UTC(2014, 11, 5),
+            //     y: 1
+            // }, {
+            //     x: Date.UTC(2014, 11, 8),
+            //     x2: Date.UTC(2014, 11, 9),
+            //     y: 2
+            // }, {
+            //     x: Date.UTC(2014, 11, 9),
+            //     x2: Date.UTC(2014, 11, 19),
+            //     y: 1
+            // }, {
+            //     x: Date.UTC(2014, 11, 10),
+            //     x2: Date.UTC(2014, 11, 23),
+            //     y: 2
+            // }],
             dataLabels: {
                 enabled: true,
                 align: 'center',
@@ -147,11 +150,6 @@ const Annotation = (props: any) => {
         }
     }, []);
 
-    const fetchData = async () => {
-        const response = await API.getAnnotations();
-        setData(response.data);
-    };
-
     useEffect(() => {
         const chart = chartRef.current?.chart;
         if (chart && data) {
@@ -159,12 +157,11 @@ const Annotation = (props: any) => {
         }
     }, [data]);
 
-    useEffect(() => {
-        fetchData();
-    }, []);
+
 
     return (
-        <div style={{ width: 1000 }}>
+        // <div style={{ width: 1000 }}>
+        <div>
             <HighchartsReact highcharts={Highcharts} options={options} ref={chartRef} />
         </div>
     );

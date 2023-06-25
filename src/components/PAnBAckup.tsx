@@ -146,7 +146,8 @@ const PanChart = () => {
 
 
     return (
-        <div style={{ width: 1000 }}>
+        // <div style={{ width: 1000 }}>
+        <div>
             <HighchartsReact
                 highcharts={Highcharts}
                 ref={chartRef}

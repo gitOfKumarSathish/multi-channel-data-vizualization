@@ -45,9 +45,7 @@ const PanChart = () => {
 
     const fromToFetch = async (min: number, max: number) => {
         const response = await API.panning(min, max);
-        const apiData = `http://localhost:3000/data?from=${Math.ceil(Math.abs(min))}&to=${Math.ceil(
-            max
-        )}`;
+
         try {
             // const response = await axios.get(apiData);
             console.log('response', response);
@@ -137,7 +135,8 @@ const PanChart = () => {
         },
     };
     return (
-        <div style={{ width: 1000 }}>
+        // <div style={{ width: 1000 }}>
+        <div>
             <HighchartsReact
                 highcharts={Highcharts}
                 ref={chartRef}
