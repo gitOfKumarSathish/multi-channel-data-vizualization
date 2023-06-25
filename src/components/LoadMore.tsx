@@ -11,7 +11,7 @@ const initialOptions = {
         // events: {
         //     load: async function () {
         //         // make API call and update chart data
-        //         const { data } = await API.getFuncNodes();
+        //         const { data } = await API.getSampleData();
         //         const chart = this;
         //         console.log({ data });
         //         chart?.update({ series: [{ data }] });
@@ -71,7 +71,7 @@ const LoadMore = () => {
     const [start, setStart] = useState(0);
 
     // const fetchData = async () => {
-    //     const response = await API.getFuncNodes(start + limit);
+    //     const response = await API.getSampleData(start + limit);
     //     const newData = response.data.slice(start, start + limit);
     //     setStart(start + limit);
     //     setData([...data, ...newData]);
@@ -79,7 +79,7 @@ const LoadMore = () => {
 
     const fetchData = async () => {
         const newStart = start + limit;
-        const response = await API.getFuncNodes(newStart);
+        const response = await API.getSampleData(newStart);
         const newData = response.data.slice(start, newStart);
         setStart(newStart);
         setData((prevData: any) => [...prevData, ...newData]);

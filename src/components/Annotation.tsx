@@ -96,7 +96,8 @@ const Annotation = (props: any) => {
     }, []);
 
     return (
-        <div style={{ width: 1000 }}>
+        // <div style={{ width: 1000 }}>
+        <div>
             <HighchartsReact highcharts={Highcharts} options={options} ref={chartRef} />
         </div>
     );

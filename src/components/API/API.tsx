@@ -2,8 +2,7 @@ import axios from 'axios';
 import { limit } from '../Config';
 
 const ApiUrl = {
-    // getFuncNodes: "https://mocki.io/v1/58e86430-5d39-4c67-bce1-7676da89bdba",
-    getFuncNodes: "http://localhost:3000/data",
+    getSampleData: "http://localhost:3000/data",
     getAnnotations: "http://localhost:3000/annotation",
     getVolumes: "http://localhost:3000/volume",
     viewConfig: "http://localhost:3000/viewConfig",
@@ -22,29 +21,32 @@ async function PostMethod(url: string, data: any) {
     return response.data;
 }
 
-export function getFuncNodes(limits: number = limit) {
-    let url = ApiUrl.getFuncNodes + `?limit=${limits}`;
+
+
+
+export function getSampleData(limits: number = limit) {
+    const url = ApiUrl.getSampleData + `?limit=${limits}`;
     return GetMethod(url);
 }
 
 export function getAnnotations() {
-    let url = ApiUrl.getAnnotations;
+    const url = ApiUrl.getAnnotations;
     return GetMethod(url);
 }
 
 export function getVolumes() {
-    let url = ApiUrl.getVolumes;
+    const url = ApiUrl.getVolumes;
     return GetMethod(url);
 }
 
 export function viewConfig() {
-    let url = ApiUrl.viewConfig;
+    const url = ApiUrl.viewConfig;
     return GetMethod(url);
 }
 
 
 export function getData(channel: string) {
-    let url = `${ApiUrl.baseURl + '/' + channel}`;
+    const url = `${ApiUrl.baseURl + '/' + channel}`;
     return GetMethod(url);
 }
 

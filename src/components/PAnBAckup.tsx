@@ -16,7 +16,7 @@ const PanChart = () => {
 
     // const fetchData = async () => {
     //     const newStart = start + limit;
-    //     const response = await API.getFuncNodes(newStart);
+    //     const response = await API.getSampleData(newStart);
     //     const newData = response.data.slice(start, newStart);
     //     setStart(newStart);
     //     setData((prevData: any) => [...newData]);

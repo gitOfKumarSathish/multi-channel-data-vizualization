@@ -45,6 +45,10 @@ const Channel2 = (props: any) => {
         tooltip: {
             shared: true,
             crosshair: true,
+            formatter(this: any): string {
+                console.log('this.tooltip', this);
+                return `<b>${this.x}</b><br/><b>${this.y}</b>`;
+            },
         },
         series: src_channels.map((x: any) => [{ data: [] }])
     };
@@ -83,7 +87,8 @@ const Channel2 = (props: any) => {
     }, []);
 
     return (
-        <div style={{ width: '1000px' }}>
+        // <div style={{ width: 1000 }}>
+        <div>
             <HighchartsReact highcharts={Highcharts} options={options} ref={chartRef} />
         </div>
 

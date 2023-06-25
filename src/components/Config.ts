@@ -2,7 +2,7 @@ const limit = 5000;
 
 const dataMappingForBasicChart = (data: any, chart: any) => {
     const multiChannelData: { name: string; data: any; }[] = [];
-
+    let xAxisTsArray;
     data.forEach((singleChannelData: { channel: string; data: any; }) => {
         const { channel, data: dataFromAPI } = singleChannelData;
 
@@ -16,14 +16,17 @@ const dataMappingForBasicChart = (data: any, chart: any) => {
             name: channel,
             data: plotValueArray
         });
-    });
 
-    const xAxisTsArray = multiChannelData.flatMap(channelData => channelData.data.map((item: any) => item.xAxisTs));
+        xAxisTsArray = chartData?.map((channelData: { xAxisTs: any; data: any[]; }) => channelData?.xAxisTs);
+        console.log('xAxisTsArray', xAxisTsArray);
+    });
 
     chart.update({
         series: multiChannelData,
         xAxis: [{ categories: xAxisTsArray }],
     });
+
+    console.log('chart updated', chart);
 };
 
 
@@ -68,7 +71,7 @@ const dataMappingForAnnotation = (data: any, chart: any) => {
 
     chart.update({
         series: multiChannelData,
-        yAxis: [{ categories: uniqueArray }],
+        // yAxis: [{ categories: uniqueArray }],
     });
 
 
