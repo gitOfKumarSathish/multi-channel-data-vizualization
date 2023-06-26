@@ -1,4 +1,4 @@
-const limit = 5000;
+const limit = 1000;
 const limitForAnnotation = 1000;
 
 const dataMappingForBasicChart = (data: any, chart: any) => {

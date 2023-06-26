@@ -63,7 +63,7 @@ export function Annotpanning(min: number, max: number) {
 
 export function panning(min: number, max: number) {
     // const url = ApiUrl;
-    const cc = `${ApiUrl.getFuncNodes + '?from=' + Math.ceil(Math.abs(min)) + '&to=' + Math.ceil(Math.abs(max))}`;
+    const cc = `${ApiUrl.getVolumes + '?from=' + Math.ceil(Math.abs(min)) + '&to=' + Math.ceil(Math.abs(max))}`;
 
     console.log('cc', cc);
     // const surl = `http://localhost:3000/data?from=${Math.ceil(Math.abs(min))}&to=${Math.ceil(

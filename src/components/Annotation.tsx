@@ -1,12 +1,14 @@
 import React, { useRef, useEffect, memo, useState } from "react";
 import Highcharts from "highcharts";
 import HighchartsReact from "highcharts-react-official";
+import HighchartsBoost from 'highcharts/modules/boost';
 import xrange from "highcharts/modules/xrange";
 import * as API from './API/API';
 import { dataMappingForAnnotation, limitForAnnotation } from "./Config";
 
 // Initialize HighchartsMore module
 xrange(Highcharts);
+HighchartsBoost(Highcharts);
 
 let previousMin = 0;
 let previousMax = 0;
@@ -14,6 +16,8 @@ let previousMax = 0;
 const Annotation = (props: any) => {
     const { chart, chart_type, x_label, y_label } = props.configs;
     const chartRef = useRef<HighchartsReact.Props>(null);
+    const [isLoading, setIsLoading] = useState<boolean>();
+
     const [data, setData] = useState<any>([]);
     const [xAxesValues, setXAxesValues] = useState<{ xAxisMin: number; xAxisMax: number; }>({
         xAxisMin: 0,
@@ -35,6 +39,9 @@ const Annotation = (props: any) => {
             previousMin = xAxis[0].min;
             previousMax = xAxis[0].max;
             setXAxesValues({ xAxisMin: xAxesValues.xAxisMax, xAxisMax: xAxesValues.xAxisMax + limitForAnnotation });
+        } else {
+            setXAxesValues({ xAxisMin: xAxesValues.xAxisMax, xAxisMax: xAxesValues.xAxisMax + limitForAnnotation });
+
         }
     };
 
@@ -44,12 +51,14 @@ const Annotation = (props: any) => {
 
     const fromToFetch = async (min: number, max: number) => {
         const response = await API.Annotpanning(min, max);
+        setIsLoading(true);
 
         try {
             // const response = await axios.get(apiData);
             const newData = response?.data;
             const checking = newData;
             setData((prevData: any) => [...prevData, ...newData]);
+            setIsLoading(false); // Hide the loading indicator
             // setData(newData);
             // setVisibleData(newData);
         } catch (error) {
@@ -103,6 +112,8 @@ const Annotation = (props: any) => {
             borderColor: 'gray',
             pointWidth: 20,
             data: [],
+            turboThreshold: 100000,
+
             // data: [{
             //     x: Date.UTC(2014, 10, 21),
             //     x2: Date.UTC(2014, 11, 2),
@@ -138,7 +149,8 @@ const Annotation = (props: any) => {
             },
         },
         {
-            data: []
+            data: [],
+            turboThreshold: 100000,
         }
         ]
 
@@ -162,7 +174,9 @@ const Annotation = (props: any) => {
     return (
         // <div style={{ width: 1000 }}>
         <div>
-            <HighchartsReact highcharts={Highcharts} options={options} ref={chartRef} />
+            {isLoading ? <div>Loading...</div> :
+                <HighchartsReact highcharts={Highcharts} options={options} ref={chartRef} isLoading={isLoading} />
+            }
         </div>
     );
 };
