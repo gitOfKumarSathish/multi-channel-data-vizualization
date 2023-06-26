@@ -3,6 +3,7 @@ import * as API from './API/API';
 import { Chart } from 'highcharts';
 import Channel2 from './Channel2';
 import Annotation from './Annotation';
+import Volumn from './Volumn';
 
 export default function Charts() {
     const [viewConfigs, setViewConfigs] = useState<any>([]);
@@ -39,6 +40,7 @@ export default function Charts() {
 
             if (['line', 'bar', 'column'].includes(chart_type)) {
                 return <Channel2 key={index} configs={viewConfig} />;
+                // return <Volumn key={index} configs={viewConfig} />;
             } else if (chart_type === 'xrange') {
                 return <Annotation key={index} configs={viewConfig} />;
             } else {

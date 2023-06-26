@@ -5,6 +5,9 @@ import LoadMore from './components/LoadMore';
 import PanChart from './components/Pan';
 import Annotation from './components/Annotation';
 import Charts from './components/Charts';
+import MyChart from './components/scaler';
+import LoadMoreBackup from './components/loadMoreBackupTypetwo';
+import LoadMoreBackupTypeFour from './components/loadMoreBackupTypeFour';
 
 function App() {
 
@@ -16,6 +19,9 @@ function App() {
       {/* <PanChart /> */}
       {/* <LoadMore /> */}
       {/* <Annotation /> */}
+      {/* <MyChart /> */}
+      <LoadMoreBackup />
+      <LoadMoreBackupTypeFour />
     </>
   );
 }

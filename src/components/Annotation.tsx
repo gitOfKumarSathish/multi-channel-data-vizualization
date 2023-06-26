@@ -5,7 +5,8 @@ import HighchartsBoost from 'highcharts/modules/boost';
 import xrange from "highcharts/modules/xrange";
 import * as API from './API/API';
 import { dataMappingForAnnotation, limitForAnnotation } from "./Config";
-
+import HighchartsStock from 'highcharts/modules/stock'; // import the Highcharts Stock module
+HighchartsStock(Highcharts); // initialize the Stock module
 // Initialize HighchartsMore module
 xrange(Highcharts);
 HighchartsBoost(Highcharts);
@@ -50,7 +51,7 @@ const Annotation = (props: any) => {
     }, [xAxesValues]);
 
     const fromToFetch = async (min: number, max: number) => {
-        const response = await API.Annotpanning(min, max);
+        const response = await API.Annotpanning(min, 20000);
         setIsLoading(true);
 
         try {
@@ -147,12 +148,23 @@ const Annotation = (props: any) => {
                     return this.point?.title;
                 },
             },
+
         },
         {
             data: [],
             turboThreshold: 100000,
+        },
+
+        ],
+        navigator: {
+            enabled: true // enable the navigator
+        },
+        scrollbar: {
+            enabled: true // enable the scrollbar
+        },
+        rangeSelector: {
+            enabled: false // enable the range selector
         }
-        ]
 
     };
 
@@ -175,7 +187,9 @@ const Annotation = (props: any) => {
         // <div style={{ width: 1000 }}>
         <div>
             {isLoading ? <div>Loading...</div> :
-                <HighchartsReact highcharts={Highcharts} options={options} ref={chartRef} isLoading={isLoading} />
+                <HighchartsReact highcharts={Highcharts} options={options} ref={chartRef} isLoading={isLoading}
+                    constructorType={'stockChart'} // use stockChart constructor
+                />
             }
         </div>
     );

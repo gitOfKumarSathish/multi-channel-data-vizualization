@@ -61,7 +61,7 @@ export function Annotpanning(min: number, max: number) {
 }
 
 
-export function panning(min: number, max: number) {
+export function volumePanning(min: number, max: number) {
     // const url = ApiUrl;
     const cc = `${ApiUrl.getVolumes + '?from=' + Math.ceil(Math.abs(min)) + '&to=' + Math.ceil(Math.abs(max))}`;
 

@@ -2,26 +2,19 @@ const limit = 1000;
 const limitForAnnotation = 1000;
 
 const dataMappingForBasicChart = (data: any, chart: any) => {
-    const multiChannelData: { name: string; data: any; }[] = [];
-    let xAxisTsArray;
-    data.forEach((singleChannelData: { channel: string; data: any; }) => {
-        const { channel, data: dataFromAPI } = singleChannelData;
-
-        const chartData = dataFromAPI?.map((plot: { value: any; ts: any; }) => ({
-            plotValue: plot?.value,
-            xAxisTs: plot?.ts
-        }));
-
-        const plotValueArray = chartData?.map((item: { plotValue: any; }) => item?.plotValue);
-        multiChannelData.push({
-            name: channel,
-            data: plotValueArray
+    console.log('dataMappingForBasicChart', data);
+    let xAxisTsArray: any[] = [];
+    let yAxisValueArray: any[] = [];
+    if (data.length > 0) {
+        data.forEach((singleChannelData: { ts: any; value: any; }) => {
+            xAxisTsArray.push((singleChannelData?.ts)?.toFixed(2));
+            yAxisValueArray.push(singleChannelData?.value);
         });
+        console.log('xAxisTsArray', xAxisTsArray);
 
-        xAxisTsArray = chartData?.map((channelData: { xAxisTs: any; data: any[]; }) => channelData?.xAxisTs);
-    });
+    }
     chart.update({
-        series: multiChannelData,
+        series: { data: yAxisValueArray },
         xAxis: [{ categories: xAxisTsArray }],
     });
 };
@@ -42,7 +35,7 @@ const dataMappingForAnnotation = (data: any, chart: any) => {
         const chartData = {
             x: singleChannelData.bt,
             x2: singleChannelData.tt,
-            y: uniqueArray.indexOf(singleChannelData.tag),
+            // y: uniqueArray.indexOf(singleChannelData.tag),
             title: singleChannelData.tag,
         };
 
