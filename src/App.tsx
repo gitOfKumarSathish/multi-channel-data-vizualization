@@ -8,19 +8,23 @@ import Charts from './components/Charts';
 import MyChart from './components/scaler';
 import LoadMoreBackup from './components/loadMoreBackupTypetwo';
 import LoadMoreBackupTypeFour from './components/loadMoreBackupTypeFour';
+import LoadMoreBackupTypeOne from './components/loadMoreBackupTypeOne';
+import LoadMoreBackupTypeThree from './components/loadMoreBackupTypeThree';
 
 function App() {
 
   return (
     <>
-      <Charts />
+      {/* <Charts /> */}
       {/* <LineChart /> */}
       {/* <Channel2 /> */}
       {/* <PanChart /> */}
       {/* <LoadMore /> */}
       {/* <Annotation /> */}
       {/* <MyChart /> */}
+      <LoadMoreBackupTypeOne />
       <LoadMoreBackup />
+      <LoadMoreBackupTypeThree />
       <LoadMoreBackupTypeFour />
     </>
   );

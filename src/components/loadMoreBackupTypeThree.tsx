@@ -9,7 +9,7 @@ HighchartsStock(Highcharts); // initialize the Stock module
 
 
 
-const LoadMoreBackup = () => {
+const loadMoreBackupTypeThree = () => {
 
 
     const chartRef = useRef<HighchartsReact.Props>(null);
@@ -26,7 +26,7 @@ const LoadMoreBackup = () => {
             panKey: 'shift'
         },
         title: {
-            text: "loadMoreBackupTypeTwo",
+            text: "loadMoreBackupTypeThree",
         },
         xAxis: {
             // type: "datetime",
@@ -47,6 +47,7 @@ const LoadMoreBackup = () => {
         },
         tooltip: {
             formatter(this: any): string {
+                console.log('this.tooltip', this);
                 return `<b>${this.x}</b><br/><b>${this.y}</b>`;
             },
         },
@@ -83,10 +84,10 @@ const LoadMoreBackup = () => {
 
     const fetchData = async () => {
         const newStart = start + limit;
-        const response = await API.volumePanning(start, newStart);
+        const response = await API.mixed(start, newStart);
         setStart(newStart);
-
-        const newDataSet = response.data.map((val: { value: any; }) => val.value);
+        console.log('response.data', response.data);
+        const newDataSet = response.data.map((val: { values: { mean: any; }; }) => val?.values?.mean);
         setData((prevData: any) => [...prevData, ...newDataSet]);
         const xTimeStamp = response.data.map((val: { ts: any; }) => val.ts);
         setXAxisCategory((prevData: any) => [...prevData, ...xTimeStamp]);
@@ -99,6 +100,7 @@ const LoadMoreBackup = () => {
 
     useEffect(() => {
         const chart = chartRef.current?.chart;
+        console.log('xAxisCategory', xAxisCategory);
         if (chart) {
             chart.update({ series: [{ data }] }, { xAxis: [{ categories: xAxisCategory }], });
         }
@@ -108,8 +110,7 @@ const LoadMoreBackup = () => {
         fetchData();
     };
     return (
-        // <div style={{ width: 1000 }}>
-        <div>
+        <div style={{ width: 1000 }}>
             <HighchartsReact
                 highcharts={Highcharts}
                 ref={chartRef}
@@ -121,4 +122,4 @@ const LoadMoreBackup = () => {
     );
 };
 
-export default memo(LoadMoreBackup);
+export default memo(loadMoreBackupTypeThree);;

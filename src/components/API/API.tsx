@@ -6,7 +6,9 @@ const ApiUrl = {
     getAnnotations: "http://localhost:3000/annotation",
     getVolumes: "http://localhost:3000/volume",
     viewConfig: "http://localhost:3000/viewConfig",
-    baseURl: "http://localhost:3000"
+    baseURl: "http://localhost:3000",
+    waveForm: "http://localhost:3000/wf",
+    mixed: "http://localhost:3000/mixed",
 
 };
 
@@ -62,12 +64,18 @@ export function Annotpanning(min: number, max: number) {
 
 
 export function volumePanning(min: number, max: number) {
-    // const url = ApiUrl;
     const cc = `${ApiUrl.getVolumes + '?from=' + Math.ceil(Math.abs(min)) + '&to=' + Math.ceil(Math.abs(max))}`;
+    return GetMethod(cc);
+}
 
-    console.log('cc', cc);
-    // const surl = `http://localhost:3000/data?from=${Math.ceil(Math.abs(min))}&to=${Math.ceil(
-    //     max
-    // )}`
+export function waveForm(min: number, max: number) {
+    const cc = `${ApiUrl.waveForm + '?from=' + Math.ceil(Math.abs(min)) + '&to=' + Math.ceil(Math.abs(max))}`;
+
+    return GetMethod(cc);
+}
+
+export function mixed(min: number, max: number) {
+    const cc = `${ApiUrl.mixed + '?from=' + Math.ceil(Math.abs(min)) + '&to=' + Math.ceil(Math.abs(max))}`;
+
     return GetMethod(cc);
 }

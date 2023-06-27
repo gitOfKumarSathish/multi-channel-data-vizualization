@@ -2,14 +2,14 @@ import HighchartsReact from 'highcharts-react-official';
 import Highcharts from 'highcharts';
 import { memo, useEffect, useRef, useState } from 'react';
 import * as API from './API/API';
-import { limit } from './Config';
+import { limit, limitForWf } from './Config';
 import HighchartsStock from 'highcharts/modules/stock'; // import the Highcharts Stock module
 
 HighchartsStock(Highcharts); // initialize the Stock module
 
 
 
-const LoadMoreBackup = () => {
+const loadMoreBackupTypeOne = () => {
 
 
     const chartRef = useRef<HighchartsReact.Props>(null);
@@ -26,7 +26,7 @@ const LoadMoreBackup = () => {
             panKey: 'shift'
         },
         title: {
-            text: "loadMoreBackupTypeTwo",
+            text: "loadMoreBackupTypeOne",
         },
         xAxis: {
             // type: "datetime",
@@ -76,20 +76,18 @@ const LoadMoreBackup = () => {
             enabled: false // enable the range selector
         },
     };
-    const [xAxisCategory, setXAxisCategory] = useState<any>([]);
     const [start, setStart] = useState(0);
 
 
 
     const fetchData = async () => {
-        const newStart = start + limit;
-        const response = await API.volumePanning(start, newStart);
+        const newStart = start + limitForWf;
+        const response = await API.waveForm(start, newStart);
         setStart(newStart);
 
-        const newDataSet = response.data.map((val: { value: any; }) => val.value);
-        setData((prevData: any) => [...prevData, ...newDataSet]);
-        const xTimeStamp = response.data.map((val: { ts: any; }) => val.ts);
-        setXAxisCategory((prevData: any) => [...prevData, ...xTimeStamp]);
+        // const newDataSet = response.data.map((val: { value: any; }) => val.value);
+        setData((prevData: any) => [...prevData, ...response.data]);
+
     };
 
 
@@ -100,7 +98,7 @@ const LoadMoreBackup = () => {
     useEffect(() => {
         const chart = chartRef.current?.chart;
         if (chart) {
-            chart.update({ series: [{ data }] }, { xAxis: [{ categories: xAxisCategory }], });
+            chart.update({ series: [{ data }] });
         }
     }, [data]);
 
@@ -121,4 +119,4 @@ const LoadMoreBackup = () => {
     );
 };
 
-export default memo(LoadMoreBackup);
+export default memo(loadMoreBackupTypeOne);

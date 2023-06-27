@@ -2,28 +2,17 @@ import HighchartsReact from 'highcharts-react-official';
 import Highcharts from 'highcharts';
 import { memo, useEffect, useRef, useState } from 'react';
 import * as API from './API/API';
-import { PythonData } from '../assets/data';
 import xrange from "highcharts/modules/xrange";
 import HighchartsBoost from 'highcharts/modules/boost';
 import { limit } from './Config';
 import HighchartsStock from 'highcharts/modules/stock'; // import the Highcharts Stock module
 
 HighchartsStock(Highcharts); // initialize the Stock module
-// import PythonData from './../assets/data.json';
 xrange(Highcharts);
 HighchartsBoost(Highcharts);
 
 const initialOptions = {
     chart: {
-        // events: {
-        //     load: async function () {
-        //         // make API call and update chart data
-        //         const { data } = await API.getFuncNodes();
-        //         const chart = this;
-        //         console.log({ data });
-        //         chart?.update({ series: [{ data }] });
-        //     }
-        // },
         type: "xrange",
         // animation: Highcharts.svg, // don't animate in old IE
         marginRight: 10,
@@ -32,7 +21,7 @@ const initialOptions = {
         panKey: 'shift'
     },
     title: {
-        text: "Real-time Time-series Graph",
+        text: "loadMoreBackupTypeFour",
     },
     xAxis: {
         // type: "datetime",
@@ -52,9 +41,6 @@ const initialOptions = {
         categories: ['abnormal', 'normal'],
     },
     tooltip: {
-        // formatter(this: any): string {
-        //     return `<b>${Highcharts.dateFormat("%Y-%m-%d %H:%M:%S", this.x)}</b><br/><b>${this.y}</b>`;
-        // },
         formatter(this: any): string {
             return `<b>${this.x.toFixed(2) + ' - ' + this.x2.toFixed(2)}</b><br/><b>${this.yCategory}</b>`;
         },
@@ -89,7 +75,11 @@ const initialOptions = {
     ],
 
     navigator: {
-        enabled: true // enable the navigator
+        enabled: true, // enable the navigator
+        xAxis: {
+            min: 0, // set the minimum value to the start of the current month
+            max: 10000 // set the maximum value to the end of the third month from now
+        }
     },
     scrollbar: {
         enabled: true // enable the scrollbar
@@ -110,9 +100,8 @@ const loadMoreBackupTypeFour = () => {
         const newStart = start + limit;
         const response = await API.Annotpanning(start, newStart);
         setStart(newStart);
-        console.log('Annotpanning respping', response.data);
 
-        response.data.map((singleChannelData: {
+        response.data?.map((singleChannelData: {
             bt: any;
             tt: any;
             tag(tag: any): unknown; data: any;
@@ -120,10 +109,9 @@ const loadMoreBackupTypeFour = () => {
             const chartData = {
                 x: singleChannelData.bt,
                 x2: singleChannelData.tt,
-                y: singleChannelData.tag === 'normal' ? 1 : 0,
+                y: singleChannelData?.tag === 'normal' ? 1 : 0,
                 title: singleChannelData.tag,
             };
-            console.log('chartData', chartData);
             setData((prevData: any) => [...prevData, chartData]);
         });
 
@@ -137,13 +125,10 @@ const loadMoreBackupTypeFour = () => {
 
     useEffect(() => {
         const chart = chartRef.current?.chart;
-        console.log('data', data);
         if (chart && data) {
-            // chart.update({ series: [{ data }] });
             chart.update({
                 series: [
                     {
-                        // ...chart.series[0].data,
                         data: data,
                     },
                 ],

@@ -1,5 +1,6 @@
 const limit = 1000;
 const limitForAnnotation = 1000;
+const limitForWf = 5000;
 
 const dataMappingForBasicChart = (data: any, chart: any) => {
     console.log('dataMappingForBasicChart', data);
@@ -52,6 +53,7 @@ const dataMappingForAnnotation = (data: any, chart: any) => {
 
 export {
     limit,
+    limitForWf,
     dataMappingForBasicChart,
     dataMappingForAnnotation,
     limitForAnnotation
