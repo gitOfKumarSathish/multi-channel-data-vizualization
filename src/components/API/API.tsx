@@ -75,7 +75,7 @@ export function waveForm(min: number, max: number) {
 }
 
 export function mixed(min: number, max: number) {
-    const cc = `${ApiUrl.mixed + '?from=' + Math.ceil(Math.abs(min)) + '&to=' + Math.ceil(Math.abs(max))}`;
+    const cc = `${ApiUrl.mixed + '?from=' + min + '&to=' + max}`;
 
     return GetMethod(cc);
 }

@@ -22,10 +22,10 @@ function App() {
       {/* <LoadMore /> */}
       {/* <Annotation /> */}
       {/* <MyChart /> */}
-      <LoadMoreBackupTypeOne />
-      <LoadMoreBackup />
+      {/* <LoadMoreBackupTypeOne /> */}
+      {/* <LoadMoreBackup /> */}
       <LoadMoreBackupTypeThree />
-      <LoadMoreBackupTypeFour />
+      {/* <LoadMoreBackupTypeFour /> */}
     </>
   );
 }
