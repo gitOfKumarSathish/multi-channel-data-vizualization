@@ -3,7 +3,31 @@ const limitForAnnotation = 1000;
 const limitForWf = 5000;
 const limitForMixed = 1000;
 
-const dataMappingForBasicChart = (data: any, chart: any) => {
+// const dataMappingForBasicChart = (data: any, chart: any) => {
+//     console.log('dataMappingForBasicChart', data);
+
+//     if (data.length > 0) {
+//         data.forEach((singleChannelData: { data: any; }) => {
+//             let xAxisTsArray: any[] = [];
+//             let yAxisValueArray: any[] = [];
+//             console.log('singleChannelData', singleChannelData);
+//             singleChannelData?.data.map((x: { ts: any; value: any; }) => {
+//                 xAxisTsArray.push((x?.ts)?.toFixed(2));
+//                 yAxisValueArray.push(x?.value);
+//             });
+
+//             console.log('xAxisTsArray', xAxisTsArray);
+//             chart.update({
+//                 series: { data: yAxisValueArray },
+//                 xAxis: [{ categories: xAxisTsArray }],
+//             });
+//         });
+
+//     }
+
+// };
+
+const dataMappingForBasicChart = (data: any) => {
     console.log('dataMappingForBasicChart', data);
 
     if (data.length > 0) {
@@ -17,10 +41,6 @@ const dataMappingForBasicChart = (data: any, chart: any) => {
             });
 
             console.log('xAxisTsArray', xAxisTsArray);
-            chart.update({
-                series: { data: yAxisValueArray },
-                xAxis: [{ categories: xAxisTsArray }],
-            });
         });
 
     }

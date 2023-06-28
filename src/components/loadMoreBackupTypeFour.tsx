@@ -33,7 +33,6 @@ const loadMoreBackupTypeFour = (props: any) => {
 
             Yaxis.push(singleChannelData.tag);
             uniqueArray = [...new Set(Yaxis)];
-            console.log('uniqueArray', uniqueArray);
             setXAxisCategory(uniqueArray);
             const chartData = {
                 x: singleChannelData.bt,

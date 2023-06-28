@@ -6,12 +6,12 @@ import { dataMappingForBasicChart, limit } from './Config';
 import HighchartsStock from 'highcharts/modules/stock'; // import the Highcharts Stock module
 
 HighchartsStock(Highcharts); // initialize the Stock module
-
+let dummyData = [];
 const LoadMoreBackup = (props: any) => {
     const { chart_title, chart_type, x_label, y_label, miniMap, data_limit, src_channels } = props.configs;
     const chartRef = useRef<HighchartsReact.Props>(null);
     const [data, setData] = useState<any>([]);
-    const [xAxisCategory, setXAxisCategory] = useState<any>([]);
+    const [xAxisCategory, setXAxisCategory] = useState<any>({});
     const [start, setStart] = useState(0);
     const [overAllData, setOverAllData] = useState<any[]>([]);
 
@@ -19,30 +19,24 @@ const LoadMoreBackup = (props: any) => {
         const newStart = start + data_limit;
         setStart(newStart);
 
-        // const promises = src_channels.map((eachChannel: { channel: string; }) =>
-        //     API.getData(eachChannel.channel, start, newStart)
-        // );
 
-        // try {
-        //     const responses = await Promise.all(promises);
-        //     // const newData = responses.reduce((acc: any[], response: any) => {
+        await dataMapping(src_channels, start, newStart, data, setData);
 
-        //     //     acc.push(...response.data);
-        //     //     return acc;
-        //     // }, []);
-        //     console.log('new data', responses);
-        //     setData((prev: any) => [...prev, ...responses]);
-        // } catch (error) {
-        //     console.error('Error fetching data:', error);
-        // }
+        // const xxx = data.forEach((item: any) => {
+        //     console.log('item', item.data.map((val) => val.value));
+        //     return item.data.map((val) => val.value);
+        // });
+        // const xTimeStamp = data.forEach((item: any) => item.data.map((val: { ts: any; }) => val.ts));
 
+        // console.log('xx', xxx);
+        // console.log('xTimeStamp', xTimeStamp);
 
-        const response = await API.volume(start, newStart);
-        setOverAllData((prevData: any) => [...prevData, ...response.data]);
-        const newDataSet = response.data.map((val: { value: any; }) => val.value);
-        setData((prevData: any) => [...prevData, ...newDataSet]);
-        const xTimeStamp = response.data.map((val: { ts: any; }) => (val.ts).toFixed(2));
-        setXAxisCategory((prevData: any) => [...prevData, ...xTimeStamp]);
+        // const response = await API.volume(start, newStart);
+        // setOverAllData((prevData: any) => [...prevData, ...response.data]);
+        // const newDataSet = response.data.map((val: { value: any; }) => val.value);
+        // setData((prevData: any) => [...prevData, ...newDataSet]);
+        // const xTimeStamp = response.data.map((val: { ts: any; }) => (val.ts).toFixed(2));
+        // setXAxisCategory((prevData: any) => [...prevData, ...xTimeStamp]);
     };
 
     useEffect(() => {
@@ -52,10 +46,21 @@ const LoadMoreBackup = (props: any) => {
     useEffect(() => {
         const chart = chartRef.current?.chart;
         if (chart) {
-            console.log('data', data);
-            // dataMappingForBasicChart(data, chart);
-            chart.update({ series: [{ data }] }, false);
-            chart.xAxis[0].setCategories(xAxisCategory, false);
+            const seriesData = data.map((channelData: any) => {
+                const series = {
+                    name: channelData.channel,
+                    data: channelData.data.map((val: any[]) => val[1]),
+                };
+
+                return series;
+            });
+
+            const updatedCategories = data.flatMap((channelData: any) => {
+                return channelData.data.map((val: any[]) => val[0]?.toFixed(2));
+            });
+
+            chart.update({ series: seriesData }, false);
+            chart.xAxis[0].setCategories(updatedCategories, false);
             chart.redraw();
         }
     }, [data]);
@@ -81,6 +86,7 @@ const LoadMoreBackup = (props: any) => {
             tickPixelInterval: 100,
             tickmarkPlacement: 'on',
             labels: {
+                rotation: -10,
                 formatter(this: any): string {
                     // Convert the timestamp to a date string
                     return this.value;
@@ -89,21 +95,31 @@ const LoadMoreBackup = (props: any) => {
             title: {
                 text: String(x_label),
             },
+            tickLength: 10,
+
+            categories: []
         },
         yAxis: {
             lineWidth: 1,
             opposite: false,
 
             // categories: xAxisCategory,
-            // type: 'logarithmic',
+            type: 'logarithmic',
             title: {
                 text: String(y_label),
             },
         },
+
         tooltip: {
+            shared: true,
             formatter(this: any): string {
-                return `<b>${this.x}</b><br/><b>${this.y}</b>`;
-            },
+                let tooltip = '<b>' + 'ts : ' + this.x + '</b><br/>';
+                this.points.forEach(function (point: { series: { name: string; }; y: string; }) {
+                    tooltip += '<b>' + point.series.name + ': ' + point.y + '</b><br/>';
+                });
+                console.log('tooltip', tooltip);
+                return tooltip;
+            }
         },
         legend: {
             enabled: true,
@@ -116,34 +132,26 @@ const LoadMoreBackup = (props: any) => {
         exporting: {
             enabled: true,
         },
-        // series: data.map(x => [{ data: [] }]),
-
-        series: [
-            {
-                name: "Random data",
-                data: data,
-                turboThreshold: 100000,
-                pointPadding: 1,
-                groupPadding: 1,
-                borderColor: 'gray',
-                pointWidth: 20,
-                dataLabels: {
-                    enabled: false,
-                    align: 'center',
-                    style: {
-                        fontSize: '14px',
-                        fontWeight: 'bold',
-                    },
-                    formatter(this: any): string {
-                        return this.point?.title;
-                    },
+        series: data.map((x: any) => ({
+            data: [],
+            turboThreshold: 100000,
+            pointPadding: 1,
+            groupPadding: 1,
+            borderColor: 'gray',
+            pointWidth: 20,
+            dataLabels: {
+                enabled: false,
+                align: 'center',
+                style: {
+                    fontSize: '14px',
+                    fontWeight: 'bold',
                 },
-
-                // keys: ['y', 'id'],
-                // data: [[29.9, '0'], [71.5, '1'], [106.4, '2']]
+                formatter(this: any): string {
+                    return this.point?.title;
+                },
             },
+        })),
 
-        ],
         navigator: {
             enabled: Boolean(miniMap), // enable the navigator
             adaptToUpdatedData: true,
@@ -180,3 +188,30 @@ const LoadMoreBackup = (props: any) => {
 };
 
 export default memo(LoadMoreBackup);
+
+async function dataMapping(src_channels: any, start: number, newStart: any, data: any, setData: { (value: any): void; (arg0: any[]): void; }) {
+    const promises = src_channels.map(async (eachChannel: { channel: string; }) => {
+        const response = await API.getData(eachChannel.channel, start, newStart);
+        const seriesData = response.data.map((item: any) => [item.ts, item.value]);
+        return {
+            channel: eachChannel.channel,
+            data: seriesData
+        };
+    });
+
+    try {
+        const responses = await Promise.all(promises);
+        responses.forEach((response: any) => {
+            const existingChannelIndex = data.findIndex((item: any) => item.channel === response.channel);
+
+            if (existingChannelIndex !== -1) {
+                data[existingChannelIndex].data = [...data[existingChannelIndex].data, ...response.data];
+            } else {
+                data.push(response);
+            }
+        });
+        setData([...data]);
+    } catch (error) {
+        console.error('Error fetching data:', error);
+    }
+}
