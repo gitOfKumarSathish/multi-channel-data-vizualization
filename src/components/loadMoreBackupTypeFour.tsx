@@ -88,6 +88,7 @@ const loadMoreBackupTypeFour = (props: any) => {
         },
         yAxis: {
             opposite: false,
+            lineWidth: 1,
             title: {
                 text: String(y_label),
             },
@@ -99,6 +100,11 @@ const loadMoreBackupTypeFour = (props: any) => {
             },
         },
         legend: {
+            enabled: true,
+            verticalAlign: 'top',
+            align: 'center'
+        },
+        credits: {
             enabled: false,
         },
         exporting: {
@@ -151,14 +157,14 @@ const loadMoreBackupTypeFour = (props: any) => {
 
 
     return (
-        <div style={{ width: 1000 }}>
+        <div style={{ width: 1000 }} className='chartParent'>
             <HighchartsReact
                 highcharts={Highcharts}
                 ref={chartRef}
                 options={Options}
                 constructorType={'stockChart'} // use stockChart constructor
             />
-            <button onClick={handlePan}>Load More</button>
+            <button onClick={handlePan} className='loadMoreButton'>Load More</button>
         </div>
     );
 };

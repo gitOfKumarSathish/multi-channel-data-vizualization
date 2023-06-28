@@ -45,13 +45,13 @@ export default function Charts() {
             if (data_type === "wf") {
                 return <LoadMoreBackupTypeOne key={index} configs={viewConfig} />;
             }
-            // else if (data_type === "volume") {
-            //     return <LoadMoreBackupTypetwo key={index} configs={viewConfig} />;
-            // } else if (data_type === "mixed") {
-            //     return <LoadMoreBackupTypeThree key={index} configs={viewConfig} />;
-            // } else if (data_type === "annot") {
-            //     return <LoadMoreBackupTypeFour key={index} configs={viewConfig} />;
-            // }
+            else if (data_type === "volume") {
+                return <LoadMoreBackupTypetwo key={index} configs={viewConfig} />;
+            } else if (data_type === "mixed") {
+                return <LoadMoreBackupTypeThree key={index} configs={viewConfig} />;
+            } else if (data_type === "annot") {
+                return <LoadMoreBackupTypeFour key={index} configs={viewConfig} />;
+            }
         });
     };
 
