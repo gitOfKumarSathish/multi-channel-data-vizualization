@@ -11,94 +11,9 @@ HighchartsStock(Highcharts); // initialize the Stock module
 xrange(Highcharts);
 HighchartsBoost(Highcharts);
 
-const initialOptions = {
-    chart: {
-        type: "xrange",
-        // animation: Highcharts.svg, // don't animate in old IE
-        marginRight: 10,
-        zoomType: "xy",
-        panning: true,
-        panKey: 'shift'
-    },
-    title: {
-        text: "loadMoreBackupTypeFour",
-    },
-    xAxis: {
-        // type: "datetime",
-        tickPixelInterval: 100,
-        labels: {
-            formatter(this: any): string {
-                // Convert the timestamp to a date string
-                return this.value;
-            }
-        }
-    },
-    yAxis: {
-        opposite: false,
-        title: {
-            text: "Tags",
-        },
-        categories: ['abnormal', 'normal'],
-    },
-    tooltip: {
-        formatter(this: any): string {
-            return `<b>${this.x.toFixed(2) + ' - ' + this.x2.toFixed(2)}</b><br/><b>${this.yCategory}</b>`;
-        },
-    },
-    legend: {
-        enabled: false,
-    },
-    exporting: {
-        enabled: true,
-    },
-    series: [
-        {
-            name: "Random data",
-            data: [],
-            turboThreshold: 100000,
-            pointPadding: 1,
-            groupPadding: 1,
-            borderColor: 'gray',
-            pointWidth: 20,
-            dataLabels: {
-                enabled: false,
-                align: 'center',
-                style: {
-                    fontSize: '14px',
-                    fontWeight: 'bold',
-                },
-                formatter(this: any): string {
-                    return this.point?.title;
-                },
-            },
-        }
-    ],
-
-    navigator: {
-        enabled: true, // enable the navigator
-        adaptToUpdatedData: true,
-        xAxis: {
-            labels: {
-                formatter(this: any): string {
-                    // Format the label based on the x-axis value
-                    const xValue = this.value;
-                    return xValue;
-                },
-            },
-        }
-    },
-    scrollbar: {
-        enabled: true // enable the scrollbar
-    },
-    rangeSelector: {
-        enabled: false // enable the range selector
-    },
-};
-
-const loadMoreBackupTypeFour = () => {
+const loadMoreBackupTypeFour = (props: any) => {
+    const { chart_title, chart_type, x_label, y_label, miniMap } = props.configs;
     const chartRef = useRef<HighchartsReact.Props>(null);
-    const [options, setOptions] = useState<any>(initialOptions);
-
     const [data, setData] = useState<any>([]);
     const [start, setStart] = useState(0);
 
@@ -124,7 +39,6 @@ const loadMoreBackupTypeFour = () => {
 
     };
 
-
     useEffect(() => {
         fetchData();
     }, []);
@@ -147,7 +61,92 @@ const loadMoreBackupTypeFour = () => {
         fetchData();
     };
 
+    const Options = {
+        chart: {
+            type: String(chart_type),
+            // animation: Highcharts.svg, // don't animate in old IE
+            marginRight: 10,
+            zoomType: "xy",
+            panning: true,
+            panKey: 'shift'
+        },
+        title: {
+            text: String(chart_title),
+        },
+        xAxis: {
+            // type: "datetime",
+            tickPixelInterval: 100,
+            labels: {
+                formatter(this: any): string {
+                    // Convert the timestamp to a date string
+                    return this.value;
+                }
+            },
+            title: {
+                text: String(x_label),
+            },
+        },
+        yAxis: {
+            opposite: false,
+            title: {
+                text: String(y_label),
+            },
+            categories: ['abnormal', 'normal'],
+        },
+        tooltip: {
+            formatter(this: any): string {
+                return `<b>${this.x.toFixed(2) + ' - ' + this.x2.toFixed(2)}</b><br/><b>${this.yCategory}</b>`;
+            },
+        },
+        legend: {
+            enabled: false,
+        },
+        exporting: {
+            enabled: true,
+        },
+        series: [
+            {
+                name: "Random data",
+                data: data,
+                turboThreshold: 100000,
+                pointPadding: 1,
+                groupPadding: 1,
+                borderColor: 'gray',
+                pointWidth: 20,
+                dataLabels: {
+                    enabled: false,
+                    align: 'center',
+                    style: {
+                        fontSize: '14px',
+                        fontWeight: 'bold',
+                    },
+                    formatter(this: any): string {
+                        return this.point?.title;
+                    },
+                },
+            }
+        ],
 
+        navigator: {
+            enabled: Boolean(miniMap), // enable the navigator
+            adaptToUpdatedData: true,
+            xAxis: {
+                labels: {
+                    formatter(this: any): string {
+                        // Format the label based on the x-axis value
+                        const xValue = this.value;
+                        return xValue;
+                    },
+                },
+            }
+        },
+        scrollbar: {
+            enabled: true // enable the scrollbar
+        },
+        rangeSelector: {
+            enabled: false // enable the range selector
+        },
+    };
 
 
 
@@ -156,7 +155,7 @@ const loadMoreBackupTypeFour = () => {
             <HighchartsReact
                 highcharts={Highcharts}
                 ref={chartRef}
-                options={options}
+                options={Options}
                 constructorType={'stockChart'} // use stockChart constructor
             />
             <button onClick={handlePan}>Load More</button>

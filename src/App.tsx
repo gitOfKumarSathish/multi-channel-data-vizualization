@@ -15,17 +15,17 @@ function App() {
 
   return (
     <>
-      {/* <Charts /> */}
+      <Charts />
       {/* <LineChart /> */}
       {/* <Channel2 /> */}
       {/* <PanChart /> */}
       {/* <LoadMore /> */}
       {/* <Annotation /> */}
       {/* <MyChart /> */}
-      <LoadMoreBackupTypeOne />
+      {/* <LoadMoreBackupTypeOne />
       <LoadMoreBackup />
       <LoadMoreBackupTypeThree />
-      <LoadMoreBackupTypeFour />
+      <LoadMoreBackupTypeFour /> */}
     </>
   );
 }

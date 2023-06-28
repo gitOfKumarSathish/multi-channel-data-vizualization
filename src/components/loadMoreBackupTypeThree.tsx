@@ -7,7 +7,8 @@ import HighchartsStock from 'highcharts/modules/stock'; // import the Highcharts
 
 HighchartsStock(Highcharts); // initialize the Stock module
 
-const loadMoreBackupTypeThree = () => {
+const loadMoreBackupTypeThree = (props: any) => {
+    const { chart_title, chart_type, x_label, y_label, miniMap } = props.configs;
     const chartRef = useRef<HighchartsReact.Props>(null);
     const [xAxisCategory, setXAxisCategory] = useState<any[]>([]);
     const [start, setStart] = useState(0);
@@ -54,24 +55,28 @@ const loadMoreBackupTypeThree = () => {
 
     const options = {
         chart: {
-            type: "line",
+            // type: "line",
+            type: String(chart_type),
             marginRight: 10,
             zoomType: "xy",
             panning: true,
             panKey: 'shift'
         },
         title: {
-            text: "loadMoreBackupTypeThree",
+            text: String(chart_title),
         },
         xAxis: {
             categories: xAxisCategory,
             tickPixelInterval: 1,
             ordinal: false,
+            title: {
+                text: String(x_label),
+            },
         },
         yAxis: {
             opposite: false,
             title: {
-                text: "Value",
+                text: String(y_label),
             },
             ordinal: false,
         },
@@ -112,7 +117,7 @@ const loadMoreBackupTypeThree = () => {
             },
         ],
         navigator: {
-            enabled: true,
+            enabled: Boolean(miniMap),
             adaptToUpdatedData: true,
             xAxis: {
                 labels: {

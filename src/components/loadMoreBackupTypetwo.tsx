@@ -9,7 +9,8 @@ HighchartsStock(Highcharts); // initialize the Stock module
 
 
 
-const LoadMoreBackup = () => {
+const LoadMoreBackup = (props: any) => {
+    const { chart_title, chart_type, x_label, y_label, miniMap } = props.configs;
     const chartRef = useRef<HighchartsReact.Props>(null);
     const [data, setData] = useState<any>([]);
     const [xAxisCategory, setXAxisCategory] = useState<any>([]);
@@ -47,7 +48,8 @@ const LoadMoreBackup = () => {
 
     const options = {
         chart: {
-            type: "line",
+            // type: "line",
+            type: String(chart_type),
             // animation: Highcharts.svg, // don't animate in old IE
             marginRight: 10,
             zoomType: "xy",
@@ -55,7 +57,7 @@ const LoadMoreBackup = () => {
             panKey: 'shift'
         },
         title: {
-            text: "loadMoreBackupTypeTwo",
+            text: String(chart_title),
         },
         xAxis: {
             type: "linear",
@@ -65,14 +67,17 @@ const LoadMoreBackup = () => {
                     // Convert the timestamp to a date string
                     return this.value;
                 }
-            }
+            },
+            title: {
+                text: String(x_label),
+            },
         },
         yAxis: {
             opposite: false,
             categories: [],
             type: 'logarithmic',
             title: {
-                text: "Value",
+                text: String(y_label),
             },
         },
         tooltip: {
@@ -93,7 +98,7 @@ const LoadMoreBackup = () => {
             },
         ],
         navigator: {
-            enabled: true, // enable the navigator
+            enabled: Boolean(miniMap), // enable the navigator
             adaptToUpdatedData: true,
             xAxis: {
                 labels: {
