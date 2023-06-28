@@ -10,15 +10,18 @@ import HighchartsStock from 'highcharts/modules/stock'; // import the Highcharts
 HighchartsStock(Highcharts); // initialize the Stock module
 xrange(Highcharts);
 HighchartsBoost(Highcharts);
-
+let Yaxis: any = [];
 const loadMoreBackupTypeFour = (props: any) => {
     const { chart_title, chart_type, x_label, y_label, miniMap, data_limit } = props.configs;
     const chartRef = useRef<HighchartsReact.Props>(null);
     const [data, setData] = useState<any>([]);
     const [start, setStart] = useState(0);
+    const [xAxisCategory, setXAxisCategory] = useState<any>([]);
 
     const fetchData = async () => {
         const newStart = start + data_limit;
+
+        let uniqueArray: string | unknown[];
         const response = await API.annot(start, newStart);
         setStart(newStart);
 
@@ -27,10 +30,16 @@ const loadMoreBackupTypeFour = (props: any) => {
             tt: any;
             tag(tag: any): unknown; data: any;
         }) => {
+
+            Yaxis.push(singleChannelData.tag);
+            uniqueArray = [...new Set(Yaxis)];
+            console.log('uniqueArray', uniqueArray);
+            setXAxisCategory(uniqueArray);
             const chartData = {
                 x: singleChannelData.bt,
                 x2: singleChannelData.tt,
-                y: singleChannelData?.tag === 'normal' ? 1 : 0,
+                // y: singleChannelData?.tag === 'normal' ? 1 : 0,
+                y: uniqueArray.indexOf(singleChannelData.tag),
                 title: singleChannelData.tag,
             };
             setData((prevData: any) => [...prevData, chartData]);
@@ -45,7 +54,6 @@ const loadMoreBackupTypeFour = (props: any) => {
 
     useEffect(() => {
         const chart = chartRef.current?.chart;
-        console.log('data', data);
         if (chart && data) {
             chart.update({
                 series: [
@@ -92,7 +100,8 @@ const loadMoreBackupTypeFour = (props: any) => {
             title: {
                 text: String(y_label),
             },
-            categories: ['abnormal', 'normal'],
+            categories: xAxisCategory
+
         },
         tooltip: {
             formatter(this: any): string {

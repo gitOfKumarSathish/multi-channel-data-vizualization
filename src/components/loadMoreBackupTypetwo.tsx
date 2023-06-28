@@ -126,6 +126,22 @@ const LoadMoreBackup = (props: any) => {
             {
                 name: "Random data",
                 data: data,
+                turboThreshold: 100000,
+                pointPadding: 1,
+                groupPadding: 1,
+                borderColor: 'gray',
+                pointWidth: 20,
+                dataLabels: {
+                    enabled: false,
+                    align: 'center',
+                    style: {
+                        fontSize: '14px',
+                        fontWeight: 'bold',
+                    },
+                    formatter(this: any): string {
+                        return this.point?.title;
+                    },
+                },
 
                 // keys: ['y', 'id'],
                 // data: [[29.9, '0'], [71.5, '1'], [106.4, '2']]

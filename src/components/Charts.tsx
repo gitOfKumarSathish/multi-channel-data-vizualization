@@ -41,7 +41,7 @@ export default function Charts() {
     const chartChannel = () => {
         return viewConfigs.map((viewConfig: { src_channels?: any; data_type?: any; chart_type?: any; x_label?: any; y_label?: any; chart?: any; }, index: number) => {
             console.log('viewConfig', viewConfig);
-            const { chart_type, data_type } = viewConfig;
+            const { data_type } = viewConfig;
             if (data_type === "wf") {
                 return <LoadMoreBackupTypeOne key={index} configs={viewConfig} />;
             }
