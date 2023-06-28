@@ -78,11 +78,7 @@ const LoadMoreBackup = (props: any) => {
             text: String(chart_title),
         },
         xAxis: {
-            // type: "linear",
-            tickPixelInterval: 1000,
-            tickLength: 100,
-
-            // gridLineWidth: 1,
+            tickPixelInterval: 100,
             tickmarkPlacement: 'on',
             labels: {
                 formatter(this: any): string {
