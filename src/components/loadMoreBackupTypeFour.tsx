@@ -27,7 +27,7 @@ const initialOptions = {
         // type: "datetime",
         tickPixelInterval: 100,
         labels: {
-            formatter: function () {
+            formatter(this: any): string {
                 // Convert the timestamp to a date string
                 return this.value;
             }
@@ -76,10 +76,10 @@ const initialOptions = {
 
     navigator: {
         enabled: true, // enable the navigator
-        xAxis: {
-            min: 0, // set the minimum value to the start of the current month
-            max: 10000 // set the maximum value to the end of the third month from now
-        }
+        // xAxis: {
+        //     min: 0, // set the minimum value to the start of the current month
+        //     max: 10000 // set the maximum value to the end of the third month from now
+        // }
     },
     scrollbar: {
         enabled: true // enable the scrollbar
@@ -125,6 +125,7 @@ const loadMoreBackupTypeFour = () => {
 
     useEffect(() => {
         const chart = chartRef.current?.chart;
+        console.log('data', data);
         if (chart && data) {
             chart.update({
                 series: [

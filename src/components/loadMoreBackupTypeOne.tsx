@@ -10,11 +10,34 @@ HighchartsStock(Highcharts); // initialize the Stock module
 
 
 const loadMoreBackupTypeOne = () => {
-
-
     const chartRef = useRef<HighchartsReact.Props>(null);
-
     const [data, setData] = useState<any>([]);
+    const [start, setStart] = useState(0);
+
+    const fetchData = async () => {
+        const newStart = start + limitForWf;
+        const response = await API.waveForm(start, newStart);
+        setStart(newStart);
+
+        // const newDataSet = response.data.map((val: { value: any; }) => val.value);
+        setData((prevData: any) => [...prevData, ...response.data]);
+
+    };
+
+    useEffect(() => {
+        fetchData();
+    }, []);
+
+    useEffect(() => {
+        const chart = chartRef.current?.chart;
+        if (chart) {
+            chart.update({ series: [{ data }] });
+        }
+    }, [data]);
+
+    const handlePan = () => {
+        fetchData();
+    };
 
     const options = {
         chart: {
@@ -75,39 +98,12 @@ const loadMoreBackupTypeOne = () => {
         rangeSelector: {
             enabled: false // enable the range selector
         },
-    };
-    const [start, setStart] = useState(0);
-
-
-
-    const fetchData = async () => {
-        const newStart = start + limitForWf;
-        const response = await API.waveForm(start, newStart);
-        setStart(newStart);
-
-        // const newDataSet = response.data.map((val: { value: any; }) => val.value);
-        setData((prevData: any) => [...prevData, ...response.data]);
-
-    };
-
-
-    useEffect(() => {
-        fetchData();
-    }, []);
-
-    useEffect(() => {
-        const chart = chartRef.current?.chart;
-        if (chart) {
-            chart.update({ series: [{ data }] });
-        }
-    }, [data]);
-
-    const handlePan = () => {
-        fetchData();
+        credits: {
+            enabled: false
+        },
     };
     return (
-        // <div style={{ width: 1000 }}>
-        <div>
+        <div style={{ width: 1000 }}>
             <HighchartsReact
                 highcharts={Highcharts}
                 ref={chartRef}

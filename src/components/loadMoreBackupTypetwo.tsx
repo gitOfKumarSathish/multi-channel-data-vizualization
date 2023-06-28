@@ -10,11 +10,39 @@ HighchartsStock(Highcharts); // initialize the Stock module
 
 
 const LoadMoreBackup = () => {
-
-
     const chartRef = useRef<HighchartsReact.Props>(null);
-
     const [data, setData] = useState<any>([]);
+    const [xAxisCategory, setXAxisCategory] = useState<any>([]);
+    const [start, setStart] = useState(0);
+
+    const fetchData = async () => {
+        const newStart = start + limit;
+        const response = await API.volumePanning(start, newStart);
+        setStart(newStart);
+
+        const newDataSet = response.data.map((val: { value: any; }) => val.value);
+        setData((prevData: any) => [...prevData, ...newDataSet]);
+        const xTimeStamp = response.data.map((val: { ts: any; }) => (val.ts).toFixed(2));
+        setXAxisCategory((prevData: any) => [...prevData, ...xTimeStamp]);
+    };
+
+
+    useEffect(() => {
+        fetchData();
+    }, []);
+
+    useEffect(() => {
+        const chart = chartRef.current?.chart;
+        if (chart) {
+            chart.update({ series: [{ data }] }, false);
+            chart.xAxis[0].setCategories(xAxisCategory, false);
+            chart.redraw();
+        }
+    }, [data]);
+
+    const handlePan = () => {
+        fetchData();
+    };
 
     const options = {
         chart: {
@@ -75,39 +103,6 @@ const LoadMoreBackup = () => {
         rangeSelector: {
             enabled: false // enable the range selector
         },
-    };
-    const [xAxisCategory, setXAxisCategory] = useState<any>([]);
-    const [start, setStart] = useState(0);
-
-
-
-    const fetchData = async () => {
-        const newStart = start + limit;
-        const response = await API.volumePanning(start, newStart);
-        setStart(newStart);
-
-        const newDataSet = response.data.map((val: { value: any; }) => val.value);
-        setData((prevData: any) => [...prevData, ...newDataSet]);
-        const xTimeStamp = response.data.map((val: { ts: any; }) => (val.ts).toFixed(2));
-        setXAxisCategory((prevData: any) => [...prevData, ...xTimeStamp]);
-    };
-
-
-    useEffect(() => {
-        fetchData();
-    }, []);
-
-    useEffect(() => {
-        const chart = chartRef.current?.chart;
-        if (chart) {
-            chart.update({ series: [{ data }] }, false);
-            chart.xAxis[0].setCategories(xAxisCategory, false);
-            chart.redraw();
-        }
-    }, [data]);
-
-    const handlePan = () => {
-        fetchData();
     };
     return (
         // <div style={{ width: 1000 }}>

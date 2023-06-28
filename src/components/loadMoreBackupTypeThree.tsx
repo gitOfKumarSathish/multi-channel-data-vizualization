@@ -24,7 +24,6 @@ const loadMoreBackupTypeThree = () => {
         setOverAllData(response.data);
         response.data.forEach(({ values, ts }: any) => {
             const mean = values?.mean;
-            // console.log('mean', mean);
             const xTimeStamp = ts.toFixed(2);
 
             if (mean) {
@@ -32,7 +31,6 @@ const loadMoreBackupTypeThree = () => {
                 newXAxisCategory.push(xTimeStamp);
             }
         });
-        // console.log('newData', newData);
         setData((prevData) => [...prevData, ...newData]);
         setXAxisCategory((prevData) => [...prevData, ...newXAxisCategory]);
     };
@@ -121,6 +119,9 @@ const loadMoreBackupTypeThree = () => {
         },
         rangeSelector: {
             enabled: false,
+        },
+        credits: {
+            enabled: false
         },
     };
 

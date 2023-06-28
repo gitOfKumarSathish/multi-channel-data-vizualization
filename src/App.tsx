@@ -25,7 +25,7 @@ function App() {
       {/* <LoadMoreBackupTypeOne /> */}
       {/* <LoadMoreBackup /> */}
       <LoadMoreBackupTypeThree />
-      {/* <LoadMoreBackupTypeFour /> */}
+      <LoadMoreBackupTypeFour />
     </>
   );
 }
