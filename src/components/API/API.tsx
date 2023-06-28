@@ -51,31 +51,23 @@ export function getData(channel: string) {
 }
 
 
-export function Annotpanning(min: number, max: number) {
-    // const url = ApiUrl;
-    const cc = `${ApiUrl.getAnnotations + '?from=' + Math.ceil(Math.abs(min)) + '&to=' + Math.ceil(Math.abs(max))}`;
-
-    console.log('cc', cc);
-    // const surl = `http://localhost:3000/data?from=${Math.ceil(Math.abs(min))}&to=${Math.ceil(
-    //     max
-    // )}`
-    return GetMethod(cc);
+export function annot(min: number, max: number) {
+    const url = `${ApiUrl.getAnnotations}?from=${min}&to=${max}`;
+    return GetMethod(url);
 }
 
-
-export function volumePanning(min: number, max: number) {
-    const cc = `${ApiUrl.getVolumes + '?from=' + Math.ceil(Math.abs(min)) + '&to=' + Math.ceil(Math.abs(max))}`;
-    return GetMethod(cc);
+export function volume(min: number, max: number) {
+    const url = `${ApiUrl.getVolumes}?from=${min}&to=${max}`;
+    return GetMethod(url);
 }
 
 export function waveForm(min: number, max: number) {
-    const cc = `${ApiUrl.waveForm + '?from=' + Math.ceil(Math.abs(min)) + '&to=' + Math.ceil(Math.abs(max))}`;
-
-    return GetMethod(cc);
+    const url = `${ApiUrl.waveForm}?from=${min}&to=${max}`;
+    return GetMethod(url);
 }
 
 export function mixed(min: number, max: number) {
-    const cc = `${ApiUrl.mixed + '?from=' + min + '&to=' + max}`;
-
-    return GetMethod(cc);
+    const url = `${ApiUrl.mixed}?from=${min}&to=${max}`;
+    return GetMethod(url);
 }
+

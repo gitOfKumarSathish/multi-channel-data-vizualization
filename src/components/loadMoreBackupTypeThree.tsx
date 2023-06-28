@@ -21,7 +21,7 @@ const loadMoreBackupTypeThree = () => {
 
         const newData: any[] = [];
         const newXAxisCategory: any[] = [];
-        setOverAllData(response.data);
+        setOverAllData((prevData) => [...prevData, ...response.data]);
         response.data.forEach(({ values, ts }: any) => {
             const mean = values?.mean;
             const xTimeStamp = ts.toFixed(2);
@@ -113,6 +113,17 @@ const loadMoreBackupTypeThree = () => {
         ],
         navigator: {
             enabled: true,
+            adaptToUpdatedData: true,
+            xAxis: {
+                labels: {
+                    formatter(this: any): string {
+                        const xValue = this.value;
+                        const correspondingData = overAllData[xValue];
+                        // Format the label based on the x-axis value
+                        return correspondingData?.ts;
+                    },
+                },
+            }
         },
         scrollbar: {
             enabled: true,

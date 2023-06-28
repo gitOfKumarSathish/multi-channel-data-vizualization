@@ -25,7 +25,7 @@ const MyChart = () => {
 
     useEffect(async () => {
         // fetch data from API and update chartOptions with new data
-        const response = await API.volumePanning(0, 10000);
+        const response = await API.volume(0, 10000);
 
         try {
             // const response = await axios.get(apiData);

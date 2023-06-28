@@ -14,12 +14,13 @@ const LoadMoreBackup = () => {
     const [data, setData] = useState<any>([]);
     const [xAxisCategory, setXAxisCategory] = useState<any>([]);
     const [start, setStart] = useState(0);
+    const [overAllData, setOverAllData] = useState<any[]>([]);
 
     const fetchData = async () => {
         const newStart = start + limit;
-        const response = await API.volumePanning(start, newStart);
+        const response = await API.volume(start, newStart);
         setStart(newStart);
-
+        setOverAllData((prevData: any) => [...prevData, ...response.data]);
         const newDataSet = response.data.map((val: { value: any; }) => val.value);
         setData((prevData: any) => [...prevData, ...newDataSet]);
         const xTimeStamp = response.data.map((val: { ts: any; }) => (val.ts).toFixed(2));
@@ -57,7 +58,7 @@ const LoadMoreBackup = () => {
             text: "loadMoreBackupTypeTwo",
         },
         xAxis: {
-            // type: "datetime",
+            type: "linear",
             tickPixelInterval: 100,
             labels: {
                 formatter(this: any): string {
@@ -68,6 +69,7 @@ const LoadMoreBackup = () => {
         },
         yAxis: {
             opposite: false,
+            categories: [],
             type: 'logarithmic',
             title: {
                 text: "Value",
@@ -92,10 +94,17 @@ const LoadMoreBackup = () => {
         ],
         navigator: {
             enabled: true, // enable the navigator
-            // xAxis: {
-            //     min: 0, // set the minimum value to the start of the current month
-            //     max: 10000 // set the maximum value to the end of the third month from now
-            // }
+            adaptToUpdatedData: true,
+            xAxis: {
+                labels: {
+                    formatter(this: any): string {
+                        const xValue = this.value;
+                        const correspondingData = overAllData[xValue];
+                        // Format the label based on the x-axis value
+                        return correspondingData?.ts;
+                    },
+                },
+            }
         },
         scrollbar: {
             enabled: true // enable the scrollbar

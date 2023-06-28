@@ -51,7 +51,7 @@ const Annotation = (props: any) => {
     }, [xAxesValues]);
 
     const fromToFetch = async (min: number, max: number) => {
-        const response = await API.Annotpanning(min, 20000);
+        const response = await API.annot(min, 20000);
         setIsLoading(true);
 
         try {

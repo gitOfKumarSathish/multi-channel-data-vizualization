@@ -72,7 +72,7 @@ const Channel2 = (props: any) => {
     }, []);
 
     const fromToFetch = async (min: number, max: number) => {
-        const response = await API.volumePanning(min, max);
+        const response = await API.volume(min, max);
 
         try {
             // const response = await axios.get(apiData);

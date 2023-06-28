@@ -76,10 +76,16 @@ const initialOptions = {
 
     navigator: {
         enabled: true, // enable the navigator
-        // xAxis: {
-        //     min: 0, // set the minimum value to the start of the current month
-        //     max: 10000 // set the maximum value to the end of the third month from now
-        // }
+        adaptToUpdatedData: true,
+        xAxis: {
+            labels: {
+                formatter(this: any): string {
+                    // Format the label based on the x-axis value
+                    const xValue = this.value;
+                    return xValue;
+                },
+            },
+        }
     },
     scrollbar: {
         enabled: true // enable the scrollbar
@@ -98,7 +104,7 @@ const loadMoreBackupTypeFour = () => {
 
     const fetchData = async () => {
         const newStart = start + limit;
-        const response = await API.Annotpanning(start, newStart);
+        const response = await API.annot(start, newStart);
         setStart(newStart);
 
         response.data?.map((singleChannelData: {
@@ -146,8 +152,7 @@ const loadMoreBackupTypeFour = () => {
 
 
     return (
-        // <div style={{ width: 1000 }}>
-        <div>
+        <div style={{ width: 1000 }}>
             <HighchartsReact
                 highcharts={Highcharts}
                 ref={chartRef}

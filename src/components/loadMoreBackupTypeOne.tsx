@@ -87,10 +87,16 @@ const loadMoreBackupTypeOne = () => {
         ],
         navigator: {
             enabled: true, // enable the navigator
-            // xAxis: {
-            //     min: 0, // set the minimum value to the start of the current month
-            //     max: 10000 // set the maximum value to the end of the third month from now
-            // }
+            adaptToUpdatedData: true,
+            xAxis: {
+                labels: {
+                    formatter(this: any): string {
+                        // Format the label based on the x-axis value
+                        const xValue = this.value;
+                        return xValue;
+                    },
+                },
+            }
         },
         scrollbar: {
             enabled: true // enable the scrollbar
