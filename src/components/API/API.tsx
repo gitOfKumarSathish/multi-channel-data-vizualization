@@ -45,8 +45,8 @@ export function viewConfig() {
 }
 
 
-export function getData(channel: string) {
-    const url = `${ApiUrl.baseURl + '/' + channel}`;
+export function getData(channel: string, min: number, max: number) {
+    const url = `${ApiUrl.baseURl + '/' + channel}?from=${min}&to=${max}`;
     return GetMethod(url);
 }
 

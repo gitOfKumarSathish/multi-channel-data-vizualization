@@ -6,8 +6,6 @@ import HighchartsStock from 'highcharts/modules/stock'; // import the Highcharts
 
 HighchartsStock(Highcharts); // initialize the Stock module
 
-
-
 const loadMoreBackupTypeOne = (props: any) => {
     const { chart_title, chart_type, x_label, y_label, miniMap, data_limit } = props.configs;
     const chartRef = useRef<HighchartsReact.Props>(null);
