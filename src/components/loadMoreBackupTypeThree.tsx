@@ -8,7 +8,7 @@ import HighchartsStock from 'highcharts/modules/stock'; // import the Highcharts
 HighchartsStock(Highcharts); // initialize the Stock module
 
 const loadMoreBackupTypeThree = (props: any) => {
-    const { chart_title, chart_type, x_label, y_label, miniMap } = props.configs;
+    const { chart_title, chart_type, x_label, y_label, miniMap, data_limit } = props.configs;
     const chartRef = useRef<HighchartsReact.Props>(null);
     const [xAxisCategory, setXAxisCategory] = useState<any[]>([]);
     const [start, setStart] = useState(0);
@@ -16,7 +16,7 @@ const loadMoreBackupTypeThree = (props: any) => {
     const [overAllData, setOverAllData] = useState<any[]>([]);
 
     const fetchData = async () => {
-        const newStart = start + limitForMixed;
+        const newStart = start + data_limit;
         const response = await API.mixed(start, newStart);
         setStart(newStart);
 

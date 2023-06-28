@@ -7,10 +7,8 @@ import HighchartsStock from 'highcharts/modules/stock'; // import the Highcharts
 
 HighchartsStock(Highcharts); // initialize the Stock module
 
-
-
 const LoadMoreBackup = (props: any) => {
-    const { chart_title, chart_type, x_label, y_label, miniMap } = props.configs;
+    const { chart_title, chart_type, x_label, y_label, miniMap, data_limit } = props.configs;
     const chartRef = useRef<HighchartsReact.Props>(null);
     const [data, setData] = useState<any>([]);
     const [xAxisCategory, setXAxisCategory] = useState<any>([]);
@@ -18,7 +16,7 @@ const LoadMoreBackup = (props: any) => {
     const [overAllData, setOverAllData] = useState<any[]>([]);
 
     const fetchData = async () => {
-        const newStart = start + limit;
+        const newStart = start + data_limit;
         const response = await API.volume(start, newStart);
         setStart(newStart);
         setOverAllData((prevData: any) => [...prevData, ...response.data]);
@@ -27,7 +25,6 @@ const LoadMoreBackup = (props: any) => {
         const xTimeStamp = response.data.map((val: { ts: any; }) => (val.ts).toFixed(2));
         setXAxisCategory((prevData: any) => [...prevData, ...xTimeStamp]);
     };
-
 
     useEffect(() => {
         fetchData();

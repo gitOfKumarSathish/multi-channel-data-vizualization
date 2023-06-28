@@ -39,18 +39,19 @@ export default function Charts() {
     // };
 
     const chartChannel = () => {
-        return viewConfigs.map((viewConfig: { src_channels?: any; dataType?: any; chart_type?: any; x_label?: any; y_label?: any; chart?: any; }, index: number) => {
+        return viewConfigs.map((viewConfig: { src_channels?: any; data_type?: any; chart_type?: any; x_label?: any; y_label?: any; chart?: any; }, index: number) => {
             console.log('viewConfig', viewConfig);
-            const { chart_type, dataType } = viewConfig;
-            if (dataType === "wf") {
+            const { chart_type, data_type } = viewConfig;
+            if (data_type === "wf") {
                 return <LoadMoreBackupTypeOne key={index} configs={viewConfig} />;
-            } else if (dataType === "volume") {
-                return <LoadMoreBackupTypetwo key={index} configs={viewConfig} />;
-            } else if (dataType === "mixed") {
-                return <LoadMoreBackupTypeThree key={index} configs={viewConfig} />;
-            } else if (dataType === "annot") {
-                return <LoadMoreBackupTypeFour key={index} configs={viewConfig} />;
             }
+            // else if (data_type === "volume") {
+            //     return <LoadMoreBackupTypetwo key={index} configs={viewConfig} />;
+            // } else if (data_type === "mixed") {
+            //     return <LoadMoreBackupTypeThree key={index} configs={viewConfig} />;
+            // } else if (data_type === "annot") {
+            //     return <LoadMoreBackupTypeFour key={index} configs={viewConfig} />;
+            // }
         });
     };
 

@@ -2,7 +2,6 @@ import HighchartsReact from 'highcharts-react-official';
 import Highcharts from 'highcharts';
 import { memo, useEffect, useRef, useState } from 'react';
 import * as API from './API/API';
-import { limit, limitForWf } from './Config';
 import HighchartsStock from 'highcharts/modules/stock'; // import the Highcharts Stock module
 
 HighchartsStock(Highcharts); // initialize the Stock module
@@ -10,17 +9,15 @@ HighchartsStock(Highcharts); // initialize the Stock module
 
 
 const loadMoreBackupTypeOne = (props: any) => {
-    const { chart_title, chart_type, x_label, y_label, miniMap } = props.configs;
+    const { chart_title, chart_type, x_label, y_label, miniMap, data_limit } = props.configs;
     const chartRef = useRef<HighchartsReact.Props>(null);
     const [data, setData] = useState<any>([]);
     const [start, setStart] = useState(0);
 
     const fetchData = async () => {
-        const newStart = start + limitForWf;
+        const newStart = start + data_limit;
         const response = await API.waveForm(start, newStart);
         setStart(newStart);
-
-        // const newDataSet = response.data.map((val: { value: any; }) => val.value);
         setData((prevData: any) => [...prevData, ...response.data]);
 
     };

@@ -12,13 +12,13 @@ xrange(Highcharts);
 HighchartsBoost(Highcharts);
 
 const loadMoreBackupTypeFour = (props: any) => {
-    const { chart_title, chart_type, x_label, y_label, miniMap } = props.configs;
+    const { chart_title, chart_type, x_label, y_label, miniMap, data_limit } = props.configs;
     const chartRef = useRef<HighchartsReact.Props>(null);
     const [data, setData] = useState<any>([]);
     const [start, setStart] = useState(0);
 
     const fetchData = async () => {
-        const newStart = start + limit;
+        const newStart = start + data_limit;
         const response = await API.annot(start, newStart);
         setStart(newStart);
 
