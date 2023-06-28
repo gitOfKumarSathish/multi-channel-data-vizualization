@@ -88,7 +88,7 @@ const LoadMoreBackup = () => {
 
         const newDataSet = response.data.map((val: { value: any; }) => val.value);
         setData((prevData: any) => [...prevData, ...newDataSet]);
-        const xTimeStamp = response.data.map((val: { ts: any; }) => val.ts);
+        const xTimeStamp = response.data.map((val: { ts: any; }) => (val.ts).toFixed(2));
         setXAxisCategory((prevData: any) => [...prevData, ...xTimeStamp]);
     };
 
@@ -100,7 +100,9 @@ const LoadMoreBackup = () => {
     useEffect(() => {
         const chart = chartRef.current?.chart;
         if (chart) {
-            chart.update({ series: [{ data }] }, { xAxis: [{ categories: xAxisCategory }], });
+            chart.update({ series: [{ data }] }, false);
+            chart.xAxis[0].setCategories(xAxisCategory, false);
+            chart.redraw();
         }
     }, [data]);
 

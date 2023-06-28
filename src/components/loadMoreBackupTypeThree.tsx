@@ -67,6 +67,7 @@ const loadMoreBackupTypeThree = () => {
         xAxis: {
             categories: xAxisCategory,
             tickPixelInterval: 1,
+            ordinal: false,
         },
         yAxis: {
             opposite: false,
