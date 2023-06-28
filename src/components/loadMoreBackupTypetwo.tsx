@@ -154,7 +154,8 @@ const LoadMoreBackup = (props: any) => {
         },
     };
     return (
-        <div style={{ width: 1000 }} className='chartParent'>
+        // style={{ width: 1000 }}
+        <div className='chartParent'>
             <HighchartsReact
                 highcharts={Highcharts}
                 ref={chartRef}
