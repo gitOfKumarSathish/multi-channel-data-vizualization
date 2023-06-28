@@ -12,6 +12,7 @@ const loadMoreBackupTypeThree = () => {
     const [xAxisCategory, setXAxisCategory] = useState<any[]>([]);
     const [start, setStart] = useState(0);
     const [data, setData] = useState<any[]>([]);
+    const [overAllData, setOverAllData] = useState<any[]>([]);
 
     const fetchData = async () => {
         const newStart = start + limitForMixed;
@@ -20,10 +21,10 @@ const loadMoreBackupTypeThree = () => {
 
         const newData: any[] = [];
         const newXAxisCategory: any[] = [];
-
+        setOverAllData(response.data);
         response.data.forEach(({ values, ts }: any) => {
             const mean = values?.mean;
-            console.log('mean', mean);
+            // console.log('mean', mean);
             const xTimeStamp = ts.toFixed(2);
 
             if (mean) {
@@ -31,7 +32,7 @@ const loadMoreBackupTypeThree = () => {
                 newXAxisCategory.push(xTimeStamp);
             }
         });
-
+        // console.log('newData', newData);
         setData((prevData) => [...prevData, ...newData]);
         setXAxisCategory((prevData) => [...prevData, ...newXAxisCategory]);
     };
@@ -74,11 +75,31 @@ const loadMoreBackupTypeThree = () => {
             title: {
                 text: "Value",
             },
+            ordinal: false,
         },
         tooltip: {
+
             formatter(this: any): string {
-                return `<b>${this.x}</b><br/><b>${this.y}</b>`;
+                const xValue = this.x;
+                const yValue = this.y;
+
+                // Find the corresponding data point in the overall data
+                const correspondingData = overAllData.find((data: any) => {
+                    return data.ts.toFixed(2) === xValue.toString();
+                });
+                console.log('correspondingData', correspondingData);
+                // Generate the tooltip content using the corresponding data
+                let tooltipContent: string = '';
+                // let tooltipContent = `<b>${xValue}</b><br/><b>${yValue}</b>`;
+                if (correspondingData) {
+                    tooltipContent += `<br/><b>mean: ${correspondingData.values.mean}</b>`;
+                    tooltipContent += `<br/><b>std: ${correspondingData.values.std}</b>`;
+                    tooltipContent += `<br/><b>ts: ${correspondingData.ts}</b>`;
+                }
+
+                return tooltipContent;
             },
+            // shared: true
         },
         legend: {
             enabled: false,
