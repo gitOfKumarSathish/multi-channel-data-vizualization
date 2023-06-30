@@ -10,7 +10,8 @@ HighchartsStock(Highcharts); // initialize the Stock module
 xrange(Highcharts);
 HighchartsBoost(Highcharts);
 let Yaxis: any = [];
-const DataTypeFour = (props: any) => {
+
+const DataTypeFour = (props: { configs: { chart_title: string; chart_type: string; x_label: string; y_label: string; miniMap: boolean; data_limit: number; src_channels: any[]; }; }) => {
     const { chart_title, chart_type, x_label, y_label, miniMap, data_limit } = props.configs;
     const chartRef = useRef<HighchartsReact.Props>(null);
     const [data, setData] = useState<any>([]);
@@ -25,9 +26,9 @@ const DataTypeFour = (props: any) => {
         setStart(newStart);
 
         response.data?.map((singleChannelData: {
-            bt: any;
-            tt: any;
-            tag(tag: any): unknown; data: any;
+            bt: number;
+            tt: number;
+            tag(tag: string): unknown; data: any;
         }) => {
 
             Yaxis.push(singleChannelData.tag);
@@ -101,10 +102,22 @@ const DataTypeFour = (props: any) => {
             categories: xAxisCategory
 
         },
+        // tooltip: {
+        //     formatter(this: any): string {
+        //         return `<b>${this.x.toFixed(2) + ' - ' + this.x2.toFixed(2)}</b><br/><b>${this.yCategory}</b>`;
+        //     },
+        // },
+
         tooltip: {
+            shared: true,
             formatter(this: any): string {
-                return `<b>${this.x.toFixed(2) + ' - ' + this.x2.toFixed(2)}</b><br/><b>${this.yCategory}</b>`;
-            },
+                let tooltip = '<b>' + 'ts : ' + this.x + '</b><br/>';
+                this.points.forEach(function (point: { x: number; x2: number; yCategory: any; }) {
+                    console.log('point', point);
+                    tooltip += `<b>${point.x.toFixed(2) + ' - ' + point.x2.toFixed(2)}</b><br/><b>${point.yCategory}</b>`;
+                });
+                return tooltip;
+            }
         },
         legend: {
             enabled: true,

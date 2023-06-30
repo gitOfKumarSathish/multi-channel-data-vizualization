@@ -5,7 +5,7 @@ import * as API from './API/API';
 import HighchartsStock from 'highcharts/modules/stock'; // import the Highcharts Stock module
 
 HighchartsStock(Highcharts); // initialize the Stock module
-const DataTypeTwo = (props: any) => {
+const DataTypeTwo = (props: { configs: { chart_title: string; chart_type: string; x_label: string; y_label: string; miniMap: boolean; data_limit: number; src_channels: any[]; }; }) => {
     const { chart_title, chart_type, x_label, y_label, miniMap, data_limit, src_channels } = props.configs;
     const chartRef = useRef<HighchartsReact.Props>(null);
     const [data, setData] = useState<any>([]);
@@ -14,10 +14,10 @@ const DataTypeTwo = (props: any) => {
     const fetchData = async () => {
         const newStart = start + data_limit;
         setStart(newStart);
-
-
+        // Note: Mapping Data based on src_channels 
         await dataMapping(src_channels, start, newStart, data, setData);
 
+        // Note: Mapping Data based on single channel 
         // const response = await API.volume(start, newStart);
         // setOverAllData((prevData: any) => [...prevData, ...response.data]);
         // const newDataSet = response.data.map((val: { value: any; }) => val.value);
@@ -126,7 +126,6 @@ const DataTypeTwo = (props: any) => {
             enabled: true,
         },
         series: data.map((x: any) => (
-            // (console.log('x', x.data.map((x: any[]) => x[0]))),
             {
 
                 data: x.data.map((x: any[]) => x[0]),
@@ -156,9 +155,6 @@ const DataTypeTwo = (props: any) => {
                     formatter(this: any): string {
                         const xValue = this.value;
                         return (data[0]?.data[xValue])[0];
-                        // const correspondingData = overAllData[xValue];
-                        // Format the label based on the x-axis value
-                        // return correspondingData?.ts;
                     },
                 },
             }

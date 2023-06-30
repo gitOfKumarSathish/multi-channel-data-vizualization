@@ -6,7 +6,7 @@ import HighchartsStock from 'highcharts/modules/stock'; // import the Highcharts
 
 HighchartsStock(Highcharts); // initialize the Stock module
 
-const DataTypeOne = (props: any) => {
+const DataTypeOne = (props: { configs: { chart_title: string; chart_type: string; x_label: string; y_label: string; miniMap: boolean; data_limit: number; }; }) => {
     const { chart_title, chart_type, x_label, y_label, miniMap, data_limit } = props.configs;
     const chartRef = useRef<HighchartsReact.Props>(null);
     const [data, setData] = useState<any>([]);
