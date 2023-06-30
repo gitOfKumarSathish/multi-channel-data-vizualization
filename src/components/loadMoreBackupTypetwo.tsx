@@ -22,15 +22,6 @@ const LoadMoreBackup = (props: any) => {
 
         await dataMapping(src_channels, start, newStart, data, setData);
 
-        // const xxx = data.forEach((item: any) => {
-        //     console.log('item', item.data.map((val) => val.value));
-        //     return item.data.map((val) => val.value);
-        // });
-        // const xTimeStamp = data.forEach((item: any) => item.data.map((val: { ts: any; }) => val.ts));
-
-        // console.log('xx', xxx);
-        // console.log('xTimeStamp', xTimeStamp);
-
         // const response = await API.volume(start, newStart);
         // setOverAllData((prevData: any) => [...prevData, ...response.data]);
         // const newDataSet = response.data.map((val: { value: any; }) => val.value);
@@ -62,6 +53,13 @@ const LoadMoreBackup = (props: any) => {
             chart.update({ series: seriesData }, false);
             chart.xAxis[0].setCategories(updatedCategories, false);
             chart.redraw();
+
+            // Update the navigator to display the new range
+            var xAxis = chart.xAxis[0];
+            var dataMin = xAxis.dataMin;
+            var dataMax = xAxis.dataMax;
+            var navigator = chart.navigator;
+            navigator.xAxis.setExtremes(dataMin, dataMax);
         }
     }, [data]);
 
@@ -117,7 +115,6 @@ const LoadMoreBackup = (props: any) => {
                 this.points.forEach(function (point: { series: { name: string; }; y: string; }) {
                     tooltip += '<b>' + point.series.name + ': ' + point.y + '</b><br/>';
                 });
-                console.log('tooltip', tooltip);
                 return tooltip;
             }
         },
@@ -132,25 +129,28 @@ const LoadMoreBackup = (props: any) => {
         exporting: {
             enabled: true,
         },
-        series: data.map((x: any) => ({
-            data: [],
-            turboThreshold: 100000,
-            pointPadding: 1,
-            groupPadding: 1,
-            borderColor: 'gray',
-            pointWidth: 20,
-            dataLabels: {
-                enabled: false,
-                align: 'center',
-                style: {
-                    fontSize: '14px',
-                    fontWeight: 'bold',
+        series: data.map((x: any) => (
+            // (console.log('x', x.data.map((x: any[]) => x[0]))),
+            {
+
+                data: x.data.map((x: any[]) => x[0]),
+                turboThreshold: 100000,
+                pointPadding: 1,
+                groupPadding: 1,
+                borderColor: 'gray',
+                pointWidth: 20,
+                dataLabels: {
+                    enabled: false,
+                    align: 'center',
+                    style: {
+                        fontSize: '14px',
+                        fontWeight: 'bold',
+                    },
+                    formatter(this: any): string {
+                        return this.point?.title;
+                    },
                 },
-                formatter(this: any): string {
-                    return this.point?.title;
-                },
-            },
-        })),
+            })),
 
         navigator: {
             enabled: Boolean(miniMap), // enable the navigator
@@ -159,9 +159,10 @@ const LoadMoreBackup = (props: any) => {
                 labels: {
                     formatter(this: any): string {
                         const xValue = this.value;
-                        const correspondingData = overAllData[xValue];
+                        return (data[0]?.data[xValue])[0];
+                        // const correspondingData = overAllData[xValue];
                         // Format the label based on the x-axis value
-                        return correspondingData?.ts;
+                        // return correspondingData?.ts;
                     },
                 },
             }
