@@ -1,13 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import * as API from './API/API';
-import { Chart } from 'highcharts';
-import Channel2 from './Channel2';
-import Annotation from './Annotation';
-import Volumn from './Volumn';
-import LoadMoreBackupTypeFour from './loadMoreBackupTypeFour';
-import LoadMoreBackupTypeOne from './loadMoreBackupTypeOne';
-import LoadMoreBackupTypeThree from './loadMoreBackupTypeThree';
-import LoadMoreBackupTypetwo from './loadMoreBackupTypetwo';
+import DataTypeOne from './DataTypeOne';
+import DataTypeTwo from './DataTypeTwo';
+import DataTypeThree from './DataTypeThree';
+import DataTypeFour from './DataTypeFour';
 
 export default function Charts() {
     const [viewConfigs, setViewConfigs] = useState<any>([]);
@@ -43,14 +39,13 @@ export default function Charts() {
             console.log('viewConfig', viewConfig);
             const { data_type } = viewConfig;
             if (data_type === "wf") {
-                return <LoadMoreBackupTypeOne key={index} configs={viewConfig} />;
-            }
-            else if (data_type === "volume") {
-                return <LoadMoreBackupTypetwo key={index} configs={viewConfig} />;
+                return <DataTypeOne key={index} configs={viewConfig} />;
+            } else if (data_type === "volume") {
+                return <DataTypeTwo key={index} configs={viewConfig} />;
             } else if (data_type === "mixed") {
-                return <LoadMoreBackupTypeThree key={index} configs={viewConfig} />;
+                return <DataTypeThree key={index} configs={viewConfig} />;
             } else if (data_type === "annot") {
-                return <LoadMoreBackupTypeFour key={index} configs={viewConfig} />;
+                return <DataTypeFour key={index} configs={viewConfig} />;
             }
         });
     };

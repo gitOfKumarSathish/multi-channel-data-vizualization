@@ -2,18 +2,14 @@ import HighchartsReact from 'highcharts-react-official';
 import Highcharts from 'highcharts';
 import { memo, useEffect, useRef, useState } from 'react';
 import * as API from './API/API';
-import { dataMappingForBasicChart, limit } from './Config';
 import HighchartsStock from 'highcharts/modules/stock'; // import the Highcharts Stock module
 
 HighchartsStock(Highcharts); // initialize the Stock module
-let dummyData = [];
-const LoadMoreBackup = (props: any) => {
+const DataTypeTwo = (props: any) => {
     const { chart_title, chart_type, x_label, y_label, miniMap, data_limit, src_channels } = props.configs;
     const chartRef = useRef<HighchartsReact.Props>(null);
     const [data, setData] = useState<any>([]);
-    const [xAxisCategory, setXAxisCategory] = useState<any>({});
     const [start, setStart] = useState(0);
-    const [overAllData, setOverAllData] = useState<any[]>([]);
 
     const fetchData = async () => {
         const newStart = start + data_limit;
@@ -188,7 +184,7 @@ const LoadMoreBackup = (props: any) => {
     );
 };
 
-export default memo(LoadMoreBackup);
+export default memo(DataTypeTwo);
 
 async function dataMapping(src_channels: any, start: number, newStart: any, data: any, setData: { (value: any): void; (arg0: any[]): void; }) {
     const promises = src_channels.map(async (eachChannel: { channel: string; }) => {

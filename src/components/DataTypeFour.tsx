@@ -4,14 +4,13 @@ import { memo, useEffect, useRef, useState } from 'react';
 import * as API from './API/API';
 import xrange from "highcharts/modules/xrange";
 import HighchartsBoost from 'highcharts/modules/boost';
-import { limit } from './Config';
 import HighchartsStock from 'highcharts/modules/stock'; // import the Highcharts Stock module
 
 HighchartsStock(Highcharts); // initialize the Stock module
 xrange(Highcharts);
 HighchartsBoost(Highcharts);
 let Yaxis: any = [];
-const loadMoreBackupTypeFour = (props: any) => {
+const DataTypeFour = (props: any) => {
     const { chart_title, chart_type, x_label, y_label, miniMap, data_limit } = props.configs;
     const chartRef = useRef<HighchartsReact.Props>(null);
     const [data, setData] = useState<any>([]);
@@ -178,4 +177,4 @@ const loadMoreBackupTypeFour = (props: any) => {
     );
 };
 
-export default memo(loadMoreBackupTypeFour);
+export default memo(DataTypeFour);

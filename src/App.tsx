@@ -6,10 +6,10 @@ import PanChart from './components/Pan';
 import Annotation from './components/Annotation';
 import Charts from './components/Charts';
 import MyChart from './components/scaler';
-import LoadMoreBackup from './components/loadMoreBackupTypetwo';
-import LoadMoreBackupTypeFour from './components/loadMoreBackupTypeFour';
-import LoadMoreBackupTypeOne from './components/loadMoreBackupTypeOne';
-import LoadMoreBackupTypeThree from './components/loadMoreBackupTypeThree';
+import LoadMoreBackup from './components/DataTypeTwo';
+import LoadMoreBackupTypeFour from './components/DataTypeFour';
+import LoadMoreBackupTypeOne from './components/DataTypeOne';
+import LoadMoreBackupTypeThree from './components/DataTypeThree';
 
 function App() {
 
