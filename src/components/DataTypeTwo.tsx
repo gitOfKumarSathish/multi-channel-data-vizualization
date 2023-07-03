@@ -94,7 +94,7 @@ const DataTypeTwo = (props: { configs: { chart_title: string; chart_type: string
             type: String(chart_type),
             // animation: Highcharts.svg, // don't animate in old IE
             marginRight: 10,
-            zoomType: "xy",
+            zoomType: "x",
             panning: true,
             panKey: 'shift',
         },
@@ -102,8 +102,8 @@ const DataTypeTwo = (props: { configs: { chart_title: string; chart_type: string
             text: String(chart_title),
         },
         xAxis: {
-            tickPixelInterval: 100,
-            tickmarkPlacement: 'on',
+            // tickPixelInterval: 100,
+            // tickmarkPlacement: 'on',
             labels: {
                 rotation: -10,
                 formatter(this: any): string {
@@ -115,7 +115,6 @@ const DataTypeTwo = (props: { configs: { chart_title: string; chart_type: string
                 text: String(x_label),
             },
             tickLength: 10,
-
             categories: []
         },
         yAxis: {
@@ -170,7 +169,8 @@ const DataTypeTwo = (props: { configs: { chart_title: string; chart_type: string
                         return this.point?.title;
                     },
                 },
-            })),
+            }
+        )),
 
         navigator: {
             enabled: Boolean(miniMap), // enable the navigator
