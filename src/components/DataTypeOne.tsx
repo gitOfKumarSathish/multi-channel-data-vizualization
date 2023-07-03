@@ -28,27 +28,47 @@ const DataTypeOne = (props: { configs: { chart_title: string; chart_type: string
 
     useEffect(() => {
         const chart = chartRef.current?.chart;
-        console.log('data', data);
         if (chart) {
-            const seriesData = data.map((channelData: any) => {
-                const series = {
-                    name: channelData.channel,
-                    data: channelData.data.map((val: any[]) => val),
+            const updatedSeries = data.map((channel: any) => {
+                let { data, sr, ts } = channel.data;
+
+                let timeDifferBetweenSamples = sr / (1000 * 1000);
+                let sampleTime = ts;
+                let sampledData: any = [];
+                data.forEach((sampleValue: number, index: number) => {
+                    if (index !== 0) {
+                        sampleTime = sampleTime + timeDifferBetweenSamples;
+                    }
+                    let sample = { value: sampleValue, time: sampleTime };
+                    sampledData.push(sample);
+                });
+                return {
+                    sampledData
                 };
-                console.log('series', series);
-                return series;
             });
 
-            const updatedCategories = data.flatMap((channelData: any) => {
-                return channelData.data.map((val: any[]) => val[0]?.toFixed(2));
+            const dra = updatedSeries?.map((series: any) => {
+                return series.sampledData.map(x => x.value);
             });
 
-            chart.update({ series: seriesData }, false);
-            chart.xAxis[0].setCategories(updatedCategories, false);
+            const vv = updatedSeries?.map((series: any) => {
+                return series.sampledData.map(x => epochConverted(x.time));
+            });
+            // const vv = updatedSeries?.map((series: any) => series.sampleData?.map((s: any) => { s.time; })
+            // );
+            // const vv = updatedSeries?.local?.map((series: any) => series.data.map(val => val.time));
+            chart.xAxis[0].setCategories(vv[0], false);
+            chart.update({ series: [{ data: dra[0] }] }, false);
             chart.redraw();
-            // chart.update({ series: [{ data }] });
         }
     }, [data]);
+
+    const epochConverted = (time: number) => {
+        const epochTime = time;
+        const date = new Date(epochTime);
+        const localISOTimeString = date.toLocaleString();
+        return (localISOTimeString.split(',')[1]).trim();
+    };
 
     const handlePan = () => {
         fetchData();
@@ -69,14 +89,14 @@ const DataTypeOne = (props: { configs: { chart_title: string; chart_type: string
         },
         xAxis: {
             // type: "datetime",
-            // tickPixelInterval: 100,
+            tickPixelInterval: 100,
             title: {
                 text: String(x_label)
             },
-            tickLength: 10,
+            // tickLength: 10,
             categories: [],
             labels: {
-                rotation: -10,
+                rotation: -25,
                 formatter(this: any): string {
                     // Convert the timestamp to a date string
                     return this.value;
@@ -108,10 +128,11 @@ const DataTypeOne = (props: { configs: { chart_title: string; chart_type: string
         exporting: {
             enabled: true,
         },
-        series: data.map((x: any) => (
+        series: data.map((_) => (
             {
 
-                data: x.data.map((x: any[]) => x[0]),
+                data: [],
+                // data: [],
                 turboThreshold: 100000,
                 pointPadding: 1,
                 groupPadding: 1,
@@ -167,27 +188,24 @@ export default memo(DataTypeOne);
 
 async function dataMapping(src_channels: any, start: number, newStart: any, data: any, setData: { (value: any): void; (arg0: any[]): void; }) {
     const promises = src_channels.map(async (eachChannel: { channel: string; }) => {
-        console.log('eachChannel', eachChannel);
         const response = await API.getData(eachChannel.channel, start, newStart);
-        const seriesData = response.data.map((item: any) => [item.ts, item]);
         return {
             channel: eachChannel.channel,
-            data: seriesData
+            data: response.data
         };
     });
 
     try {
         const responses = await Promise.all(promises);
-        responses.forEach((response: any) => {
+        responses.map((response, i) => {
             const existingChannelIndex = data.findIndex((item: any) => item.channel === response.channel);
-
             if (existingChannelIndex !== -1) {
-                data[existingChannelIndex].data = [...data[existingChannelIndex].data, ...response.data];
-            } else {
+                (data[existingChannelIndex].data.data).push(...response.data.data);
+            }
+            else {
                 data.push(response);
             }
         });
-        // console.log('data', data);
         setData([...data]);
     } catch (error) {
         console.error('Error fetching data For Type 1:', error);
