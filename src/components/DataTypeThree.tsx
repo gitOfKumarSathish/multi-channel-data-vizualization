@@ -123,7 +123,7 @@ const DataTypeThree = (props: { configs: { chart_title: any; chart_type: any; x_
         series: data.map((x: any) => (
             {
 
-                data: x.data.map((x: any[]) => x[0]),
+                data: x.data.map((x: { ts: string; }) => x?.ts),
                 turboThreshold: 100000,
                 pointPadding: 1,
                 groupPadding: 1,
