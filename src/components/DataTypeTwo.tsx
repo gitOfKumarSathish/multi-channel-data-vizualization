@@ -1,15 +1,19 @@
 import HighchartsReact from 'highcharts-react-official';
 import Highcharts from 'highcharts';
-import { memo, useEffect, useRef, useState } from 'react';
+import { memo, useContext, useEffect, useRef, useState } from 'react';
 import * as API from './API/API';
 import HighchartsStock from 'highcharts/modules/stock'; // import the Highcharts Stock module
+import { ZoomContext } from './Charts';
+import { syncCharts } from './configs';
 
 HighchartsStock(Highcharts); // initialize the Stock module
 const DataTypeTwo = (props: { configs: { chart_title: string; chart_type: string; x_label: string; y_label: string; miniMap: boolean; data_limit: number; src_channels: any[]; }; }) => {
+    console.log('props', props);
     const { chart_title, chart_type, x_label, y_label, miniMap, data_limit, src_channels } = props.configs;
     const chartRef = useRef<HighchartsReact.Props>(null);
     const [data, setData] = useState<any>([]);
     const [start, setStart] = useState(0);
+    const zoomLevel = useContext(ZoomContext);
 
     const fetchData = async () => {
         const newStart = start + data_limit;
@@ -85,6 +89,13 @@ const DataTypeTwo = (props: { configs: { chart_title: string; chart_type: string
                     // Convert the timestamp to a date string
                     return this.value;
                 }
+            },
+            events: {
+                // afterSetExtremes: syncCharts
+                setExtremes: function (e: { min: any; max: any; }) {
+                    const { min, max } = e;
+                    props.onZoomChange(min, max);
+                },
             },
             title: {
                 text: String(x_label),

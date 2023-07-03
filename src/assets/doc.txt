@@ -1,0 +1,92 @@
+there are 2 charts in 2 different file, how to zoom if one chart is zoom do the same on other chart whcih is in seperate file, in react
+
+1.Create a new context to store the zoom level:
+// ZoomContext.js
+import React from 'react';
+
+const ZoomContext = React.createContext();
+
+export default ZoomContext;
+
+2. Wrap your charts with the ZoomContext.Provider component in a higher-level component:
+
+const ChartContainer = () => {
+  const [zoomLevel, setZoomLevel] = useState(1);
+
+  const handleZoomChange = (newZoomLevel) => {
+    setZoomLevel(newZoomLevel);
+  };
+
+  return (
+    <ZoomContext.Provider value={zoomLevel}>
+      <div>
+        <Chart1 onZoomChange={handleZoomChange} />
+        <Chart2 onZoomChange={handleZoomChange} />
+      </div>
+    </ZoomContext.Provider>
+  );
+};
+
+
+3. In each separate chart file, access the zoom level from the context and apply it to the chart options:
+
+// Chart1.js
+import React, { useContext } from 'react';
+import HighchartsReact from 'highcharts-react-official';
+import Highcharts from 'highcharts';
+import ZoomContext from './ZoomContext';
+
+const Chart1 = ({ onZoomChange }) => {
+  const zoomLevel = useContext(ZoomContext);
+
+  const chartOptions = {
+    chart: {
+      zoomType: 'x',
+    },
+    xAxis: {
+      events: {
+        setExtremes: function (e) {
+          onZoomChange(e.min, e.max);
+        },
+      },
+    },
+    // ... other chart options
+  };
+
+  return <HighchartsReact highcharts={Highcharts} options={chartOptions} />;
+};
+
+export default Chart1;
+
+
+// Chart2.js
+import React, { useContext } from 'react';
+import HighchartsReact from 'highcharts-react-official';
+import Highcharts from 'highcharts';
+import ZoomContext from './ZoomContext';
+
+const Chart2 = ({ onZoomChange }) => {
+  const zoomLevel = useContext(ZoomContext);
+
+  const chartOptions = {
+    chart: {
+      zoomType: 'x',
+    },
+    xAxis: {
+      events: {
+        setExtremes: function (e) {
+          onZoomChange(e.min, e.max);
+        },
+      },
+    },
+    // ... other chart options
+  };
+
+  return <HighchartsReact highcharts={Highcharts} options={chartOptions} />;
+};
+
+export default Chart2;
+
+In this example, we are using React Context (ZoomContext) to share the zoom level between the two chart components (Chart1 and Chart2). The ChartContainer component wraps the charts with the ZoomContext.Provider and manages the zoom level state. When the zoom level changes in any of the charts, it triggers the onZoomChange callback passed as a prop from the ChartContainer. The ChartContainer updates the zoom level state, which causes a re-render of both charts with the updated zoom level.
+
+Please note that this is a simplified example, and you may need to adapt it to your specific React application structure and state management approach.
