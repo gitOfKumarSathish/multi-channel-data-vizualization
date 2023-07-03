@@ -13,38 +13,40 @@ HighchartsBoost(Highcharts);
 let Yaxis: any = [];
 
 const DataTypeFour = (props: { configs: { chart_title: string; chart_type: string; x_label: string; y_label: string; miniMap: boolean; data_limit: number; src_channels: any[]; }; }) => {
-    const { chart_title, chart_type, x_label, y_label, miniMap, data_limit } = props.configs;
+    const { chart_title, chart_type, x_label, y_label, miniMap, data_limit, src_channels } = props.configs;
     const chartRef = useRef<HighchartsReact.Props>(null);
     const [data, setData] = useState<any>([]);
     const [start, setStart] = useState(0);
     const [xAxisCategory, setXAxisCategory] = useState<any>([]);
+    const [plotting, setPlotting] = useState<any>([]);
     const zoomLevel = useContext(ZoomContext);
 
     const fetchData = async () => {
         const newStart = start + data_limit;
-
-        let uniqueArray: string | unknown[];
-        const response = await API.annot(start, newStart);
         setStart(newStart);
 
-        response.data?.map((singleChannelData: {
-            bt: number;
-            tt: number;
-            tag(tag: string): unknown; data: any;
-        }) => {
+        await dataMapping(src_channels, start, newStart, data, setData);
 
-            Yaxis.push(singleChannelData.tag);
-            uniqueArray = [...new Set(Yaxis)];
-            setXAxisCategory(uniqueArray);
-            const chartData = {
-                x: singleChannelData.bt,
-                x2: singleChannelData.tt,
-                // y: singleChannelData?.tag === 'normal' ? 1 : 0,
-                y: uniqueArray.indexOf(singleChannelData.tag),
-                title: singleChannelData.tag,
-            };
-            setData((prevData: any) => [...prevData, chartData]);
-        });
+        // const response = await API.annot(start, newStart);
+
+        // response.data?.map((singleChannelData: {
+        //     bt: number;
+        //     tt: number;
+        //     tag(tag: string): unknown; data: any;
+        // }) => {
+
+        //     Yaxis.push(singleChannelData.tag);
+        //     uniqueArray = [...new Set(Yaxis)];
+        //     setXAxisCategory(uniqueArray);
+        //     const chartData = {
+        //         x: singleChannelData.bt,
+        //         x2: singleChannelData.tt,
+        //         // y: singleChannelData?.tag === 'normal' ? 1 : 0,
+        //         y: uniqueArray.indexOf(singleChannelData.tag),
+        //         title: singleChannelData.tag,
+        //     };
+        //     setData((prevData: any) => [...prevData, chartData]);
+        // });
 
 
     };
@@ -56,33 +58,56 @@ const DataTypeFour = (props: { configs: { chart_title: string; chart_type: strin
     useEffect(() => {
         const chart = chartRef.current?.chart;
         if (chart && data) {
-            chart.update({
-                series: [
-                    {
-                        data: data,
-                    },
-                ],
+            let uniqueArray: string | unknown[];
+            data.map((channelData: { data: { bt: number; tt: number; tag(tag: string): unknown; data: any; }[]; }) => {
+                channelData?.data?.map((singleChannelData: {
+                    bt: number;
+                    tt: number;
+                    tag(tag: string): unknown; data: any;
+                }) => {
+                    Yaxis.push(singleChannelData.tag);
+                    uniqueArray = [...new Set(Yaxis)];
+                    setXAxisCategory(uniqueArray);
+                    const chartData = {
+                        x: singleChannelData.bt,
+                        x2: singleChannelData.tt,
+                        // y: singleChannelData?.tag === 'normal' ? 1 : 0,
+                        y: uniqueArray.indexOf(singleChannelData.tag),
+                        title: singleChannelData.tag,
+                    };
+                    setPlotting((prevData: any) => [...prevData, chartData]);
+                    // setPlotting([chartData]);
+                });
             });
-            chart.update({
-                xAxis: {
-                    events: {
-                        // afterSetExtremes: syncCharts
-                        setExtremes: function (e) {
-                            props.onZoomChange(e.min, e.max);
-                        },
-                    }
-                },
-            });
+
+
+            // chart.update({
+            //     series: [
+            //         {
+            //             data: data,
+            //         },
+            //     ],
+            // });
+            // chart.update({
+            //     xAxis: {
+            //         events: {
+            //             // afterSetExtremes: syncCharts
+            //             setExtremes: function (e) {
+            //                 props.onZoomChange(e.min, e.max);
+            //             },
+            //         }
+            //     },
+            // });
         }
     }, [data]);
 
-    useEffect(() => {
-        const chart = chartRef.current?.chart;
-        console.log('why chart');
-        if (chart && zoomLevel) {
-            chart.xAxis[0].setExtremes(zoomLevel.min, zoomLevel.max);
-        }
-    }, [zoomLevel]);
+    // useEffect(() => {
+    //     const chart = chartRef.current?.chart;
+    //     console.log('why chart');
+    //     if (chart && zoomLevel) {
+    //         chart.xAxis[0].setExtremes(zoomLevel.min, zoomLevel.max);
+    //     }
+    // }, [zoomLevel]);
 
     const handlePan = () => {
         fetchData();
@@ -133,7 +158,6 @@ const DataTypeFour = (props: { configs: { chart_title: string; chart_type: strin
             formatter(this: any): string {
                 let tooltip = '<b>' + 'ts : ' + this.x + '</b><br/>';
                 this.points.forEach(function (point: { x: number; x2: number; yCategory: any; }) {
-                    console.log('point', point);
                     tooltip += `<b>${point.x.toFixed(2) + ' - ' + point.x2.toFixed(2)}</b><br/><b>${point.yCategory}</b>`;
                 });
                 return tooltip;
@@ -153,7 +177,7 @@ const DataTypeFour = (props: { configs: { chart_title: string; chart_type: strin
         series: [
             {
                 name: "Random data",
-                data: data,
+                data: plotting,
                 turboThreshold: 100000,
                 pointPadding: 1,
                 groupPadding: 1,
@@ -195,7 +219,6 @@ const DataTypeFour = (props: { configs: { chart_title: string; chart_type: strin
     };
 
 
-    console.log('zoomLevel', zoomLevel);
     return (
         // style={{ width: 1000 }}
         <div className='chartParent'>
@@ -211,3 +234,30 @@ const DataTypeFour = (props: { configs: { chart_title: string; chart_type: strin
 };
 
 export default memo(DataTypeFour);
+
+async function dataMapping(src_channels: any, start: number, newStart: any, data: any, setData: { (value: any): void; (arg0: any[]): void; }) {
+    const promises = src_channels.map(async (eachChannel: { channel: string; }) => {
+        const response = await API.getData(eachChannel.channel, start, newStart);
+        // const seriesData = response.data.map((item: any) => [item.ts, item]);
+        return {
+            channel: eachChannel.channel,
+            data: response.data
+        };
+    });
+
+    try {
+        const responses = await Promise.all(promises);
+        responses?.forEach((response: any) => {
+            const existingChannelIndex = data.findIndex((item: any) => item.channel === response.channel);
+
+            if (existingChannelIndex !== -1) {
+                data[existingChannelIndex].data = [...data[existingChannelIndex]?.data, ...response.data];
+            } else {
+                data.push(response);
+            }
+        });
+        setData([...data]);
+    } catch (error) {
+        console.error('Error fetching data For Type 1:', error);
+    }
+};
