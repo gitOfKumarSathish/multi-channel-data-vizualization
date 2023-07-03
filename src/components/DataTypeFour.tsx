@@ -1,10 +1,11 @@
 import HighchartsReact from 'highcharts-react-official';
 import Highcharts from 'highcharts';
-import { memo, useEffect, useRef, useState } from 'react';
+import { memo, useContext, useEffect, useRef, useState } from 'react';
 import * as API from './API/API';
 import xrange from "highcharts/modules/xrange";
 import HighchartsBoost from 'highcharts/modules/boost';
 import HighchartsStock from 'highcharts/modules/stock'; // import the Highcharts Stock module
+import { ZoomContext } from './Charts';
 
 HighchartsStock(Highcharts); // initialize the Stock module
 xrange(Highcharts);
@@ -17,6 +18,7 @@ const DataTypeFour = (props: { configs: { chart_title: string; chart_type: strin
     const [data, setData] = useState<any>([]);
     const [start, setStart] = useState(0);
     const [xAxisCategory, setXAxisCategory] = useState<any>([]);
+    const zoomLevel = useContext(ZoomContext);
 
     const fetchData = async () => {
         const newStart = start + data_limit;
@@ -61,8 +63,26 @@ const DataTypeFour = (props: { configs: { chart_title: string; chart_type: strin
                     },
                 ],
             });
+            chart.update({
+                xAxis: {
+                    events: {
+                        // afterSetExtremes: syncCharts
+                        setExtremes: function (e) {
+                            props.onZoomChange(e.min, e.max);
+                        },
+                    }
+                },
+            });
         }
     }, [data]);
+
+    useEffect(() => {
+        const chart = chartRef.current?.chart;
+        console.log('why chart');
+        if (chart && zoomLevel) {
+            chart.xAxis[0].setExtremes(zoomLevel.min, zoomLevel.max);
+        }
+    }, [zoomLevel]);
 
     const handlePan = () => {
         fetchData();
@@ -167,7 +187,7 @@ const DataTypeFour = (props: { configs: { chart_title: string; chart_type: strin
             }
         },
         scrollbar: {
-            enabled: true // enable the scrollbar
+            enabled: false // enable the scrollbar
         },
         rangeSelector: {
             enabled: false // enable the range selector
@@ -175,7 +195,7 @@ const DataTypeFour = (props: { configs: { chart_title: string; chart_type: strin
     };
 
 
-
+    console.log('zoomLevel', zoomLevel);
     return (
         // style={{ width: 1000 }}
         <div className='chartParent'>

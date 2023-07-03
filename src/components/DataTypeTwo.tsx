@@ -1,15 +1,18 @@
 import HighchartsReact from 'highcharts-react-official';
 import Highcharts from 'highcharts';
-import { memo, useEffect, useRef, useState } from 'react';
+import { memo, useContext, useEffect, useRef, useState } from 'react';
 import * as API from './API/API';
 import HighchartsStock from 'highcharts/modules/stock'; // import the Highcharts Stock module
+import { ZoomContext } from './Charts';
 
 HighchartsStock(Highcharts); // initialize the Stock module
+let previosZoomLevel;
 const DataTypeTwo = (props: { configs: { chart_title: string; chart_type: string; x_label: string; y_label: string; miniMap: boolean; data_limit: number; src_channels: any[]; }; }) => {
     const { chart_title, chart_type, x_label, y_label, miniMap, data_limit, src_channels } = props.configs;
     const chartRef = useRef<HighchartsReact.Props>(null);
     const [data, setData] = useState<any>([]);
     const [start, setStart] = useState(0);
+    const zoomLevel = useContext(ZoomContext);
 
     const fetchData = async () => {
         const newStart = start + data_limit;
@@ -56,8 +59,30 @@ const DataTypeTwo = (props: { configs: { chart_title: string; chart_type: string
             var dataMax = xAxis.dataMax;
             var navigator = chart.navigator;
             navigator.xAxis.setExtremes(dataMin, dataMax);
+
+
+            chart.update({
+                xAxis: {
+                    events: {
+                        // afterSetExtremes: syncCharts
+                        setExtremes: function (e) {
+                            props.onZoomChange(e.min, e.max);
+                        },
+                    }
+                },
+            });
         }
     }, [data]);
+
+    useEffect(() => {
+        const chart = chartRef.current?.chart;
+        console.log('zoomLevel', zoomLevel);
+        if (chart && zoomLevel) {
+            chart.xAxis[0].setExtremes(zoomLevel.min, zoomLevel.max);
+        }
+
+    }, [zoomLevel, chartRef.current?.chart]);
+
 
     const handlePan = () => {
         fetchData();
@@ -98,7 +123,7 @@ const DataTypeTwo = (props: { configs: { chart_title: string; chart_type: string
             opposite: false,
 
             // categories: xAxisCategory,
-            type: 'logarithmic',
+            // type: 'logarithmic',
             title: {
                 text: String(y_label),
             },
@@ -160,7 +185,7 @@ const DataTypeTwo = (props: { configs: { chart_title: string; chart_type: string
             }
         },
         scrollbar: {
-            enabled: true // enable the scrollbar
+            enabled: false // enable the scrollbar
         },
         rangeSelector: {
             enabled: false // enable the range selector
