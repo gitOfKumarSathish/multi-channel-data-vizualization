@@ -6,7 +6,6 @@ import HighchartsStock from 'highcharts/modules/stock'; // import the Highcharts
 import { ZoomContext } from './Charts';
 
 HighchartsStock(Highcharts); // initialize the Stock module
-let previosZoomLevel;
 const DataTypeTwo = (props: { configs: { chart_title: string; chart_type: string; x_label: string; y_label: string; miniMap: boolean; data_limit: number; src_channels: any[]; }; }) => {
     const { chart_title, chart_type, x_label, y_label, miniMap, data_limit, src_channels } = props.configs;
     const chartRef = useRef<HighchartsReact.Props>(null);
