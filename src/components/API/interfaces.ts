@@ -1,15 +1,15 @@
 interface IViewProps {
-    data_type: any;
-    chart_type: any;
-    x_label: any;
-    y_label: any;
-    miniMap: any;
-    data_limit: any;
-    src_channels: any;
+    chart_title: string;
+    chart_type: string;
+    x_label: string;
+    y_label: string;
+    miniMap: boolean;
+    data_limit: number;
+    src_channels: ISrcChannel[];
 }
 
 interface IProps {
-    onZoomChange(min: any, max: any): unknown;
+    onZoomChange(min: number, max: number): unknown;
     configs: IViewProps & { chart_title?: any; };
 }
 
@@ -34,4 +34,9 @@ interface ISrcChannel {
     name: string;
 }
 
-export type { IProps, IViewProps, ISample, IChannelData, IChannelMappingResponse, ISrcChannel };
+interface IZoomRange {
+    min: number;
+    max: number;
+}
+
+export type { IProps, IViewProps, ISample, IChannelData, IChannelMappingResponse, ISrcChannel, IZoomRange };

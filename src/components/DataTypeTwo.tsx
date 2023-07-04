@@ -4,7 +4,7 @@ import { memo, useContext, useEffect, useRef, useState } from 'react';
 import * as API from './API/API';
 import HighchartsStock from 'highcharts/modules/stock'; // import the Highcharts Stock module
 import { ZoomContext } from './Charts';
-import { IProps } from './API/interfaces';
+import { IChannelData, IProps, ISrcChannel, IZoomRange } from './API/interfaces';
 
 HighchartsStock(Highcharts); // initialize the Stock module
 const DataTypeTwo = (props: IProps) => {
@@ -12,7 +12,7 @@ const DataTypeTwo = (props: IProps) => {
     const chartRef = useRef<HighchartsReact.Props>(null);
     const [data, setData] = useState<any>([]);
     const [start, setStart] = useState(0);
-    const [setXCategory, setSetXCategory] = useState<any>([]);
+    const [setXCategory, setSetXCategory] = useState<string[]>([]);
     const zoomLevel = useContext(ZoomContext);
 
     const fetchData = async () => {
@@ -38,8 +38,7 @@ const DataTypeTwo = (props: IProps) => {
                 xAxis: {
                     events: {
                         // afterSetExtremes: syncCharts
-                        setExtremes: function (e: { min: any; max: any; }) {
-                            console.log('e', e);
+                        setExtremes: function (e: IZoomRange) {
                             props.onZoomChange(e.min, e.max);
                         },
                     }
@@ -48,14 +47,13 @@ const DataTypeTwo = (props: IProps) => {
         }
     }, [data]);
 
-    // useEffect(() => {
-    //     const chart = chartRef.current?.chart;
-    //     console.log('zoomLevel', zoomLevel);
-    //     if (chart && zoomLevel) {
-    //         chart.xAxis[0].setExtremes(zoomLevel.min, zoomLevel.max);
-    //     }
+    useEffect(() => {
+        const chart = chartRef.current?.chart;
+        if (chart && zoomLevel) {
+            chart.xAxis[0].setExtremes(zoomLevel.min, zoomLevel.max);
+        }
 
-    // }, [zoomLevel, chartRef.current?.chart]);
+    }, [zoomLevel]);
 
 
     const handlePan = () => {
@@ -77,9 +75,9 @@ const DataTypeTwo = (props: IProps) => {
         xAxis: {
             labels: {
                 rotation: -10,
-                formatter(this: any): string {
+                formatter(this: Highcharts.AxisLabelsFormatterContextObject): string {
                     // Convert the timestamp to a date string
-                    return this.value;
+                    return String(this.value);
                 }
             },
             title: {
@@ -134,9 +132,12 @@ const DataTypeTwo = (props: IProps) => {
                         fontSize: '14px',
                         fontWeight: 'bold',
                     },
-                    formatter(this: any): string {
-                        return this.point?.title;
-                    },
+                    // formatter(this: any): string {
+                    //     return this.point?.title;
+                    // },
+                    formatter(this: Highcharts.AxisLabelsFormatterContextObject): string {
+                        return String(this.value);
+                    }
                 },
             }
         )),
@@ -150,7 +151,7 @@ const DataTypeTwo = (props: IProps) => {
             adaptToUpdatedData: true,
             xAxis: {
                 labels: {
-                    formatter(this: any): string {
+                    formatter(this: Highcharts.AxisLabelsFormatterContextObject): string | number {
                         const xValue = this.value;
                         return (setXCategory[xValue]);
                     },
@@ -180,10 +181,9 @@ const DataTypeTwo = (props: IProps) => {
 
 export default memo(DataTypeTwo);
 
-async function channelMapping(src_channels: any, start: number, newStart: any, data: any, setData: { (value: any): void; (arg0: any[]): void; }) {
+async function channelMapping(src_channels: ISrcChannel[], start: number, newStart: number, data: any, setData: { (value: any): void; (arg0: any[]): void; }) {
     const promises = src_channels.map(async (eachChannel: { channel: string; }) => {
         const response = await API.getData(eachChannel.channel, start, newStart);
-        // const seriesData = response.data.map((item: any) => [item.ts, item.value]);
         return {
             channel: eachChannel.channel,
             data: response.data
@@ -192,8 +192,8 @@ async function channelMapping(src_channels: any, start: number, newStart: any, d
 
     try {
         const responses = await Promise.all(promises);
-        responses.forEach((response: any) => {
-            const existingChannelIndex = data.findIndex((item: any) => item.channel === response.channel);
+        responses.forEach((response) => {
+            const existingChannelIndex = data.findIndex((item: { channel: string; }) => item.channel === response.channel);
 
             if (existingChannelIndex !== -1) {
                 data[existingChannelIndex].data = [...data[existingChannelIndex].data, ...response.data];

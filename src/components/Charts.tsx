@@ -4,13 +4,13 @@ import DataTypeTwo from './DataTypeTwo';
 import DataTypeFour from './DataTypeFour';
 import DataTypeThree from './DataTypeThree';
 import DataTypeOne from './DataTypeOne';
-import { IViewProps } from './API/interfaces';
+import { IViewProps, IZoomRange } from './API/interfaces';
 
 
 export const ZoomContext = React.createContext();
 export default function Charts() {
     const [viewConfigs, setViewConfigs] = useState([]);
-    const [zoomLevel, setZoomLevel] = useState<any>(null);
+    const [zoomLevel, setZoomLevel] = useState<IZoomRange>();
 
     const handleZoomChange = (min: number, max: number) => {
         setZoomLevel({ min, max });

@@ -51,13 +51,13 @@ const DataTypeFour = (props: IProps) => {
         }
     }, [data]);
 
-    // useEffect(() => {
-    //     const chart = chartRef.current?.chart;
-    //     console.log('why chart');
-    //     if (chart && zoomLevel) {
-    //         chart.xAxis[0].setExtremes(zoomLevel.min, zoomLevel.max);
-    //     }
-    // }, [zoomLevel]);
+    useEffect(() => {
+        const chart = chartRef.current?.chart;
+        console.log('why chart');
+        if (chart && zoomLevel) {
+            chart.xAxis[0].setExtremes(zoomLevel.min, zoomLevel.max);
+        }
+    }, [zoomLevel]);
 
     const handlePan = () => {
         fetchData();
@@ -68,7 +68,7 @@ const DataTypeFour = (props: IProps) => {
             type: String(chart_type),
             // animation: Highcharts.svg, // don't animate in old IE
             marginRight: 10,
-            zoomType: "xy",
+            zoomType: "x",
             panning: true,
             panKey: 'shift'
         },

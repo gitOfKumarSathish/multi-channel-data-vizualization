@@ -3,7 +3,7 @@ import Highcharts from 'highcharts';
 import { memo, useEffect, useRef, useState } from 'react';
 import * as API from './API/API';
 import HighchartsStock from 'highcharts/modules/stock'; // import the Highcharts Stock module
-import { IProps } from './API/interfaces';
+import { IProps, IZoomRange } from './API/interfaces';
 
 HighchartsStock(Highcharts); // initialize the Stock module
 
@@ -34,7 +34,7 @@ const DataTypeThree = (props: IProps) => {
                 xAxis: {
                     events: {
                         // afterSetExtremes: syncCharts
-                        setExtremes: function (e: { min: any; max: any; }) {
+                        setExtremes: function (e: IZoomRange) {
                             props.onZoomChange(e.min, e.max);
                         },
                     }

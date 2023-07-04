@@ -4,7 +4,7 @@ import { memo, useEffect, useRef, useState } from 'react';
 import * as API from './API/API';
 import HighchartsStock from 'highcharts/modules/stock'; // import the Highcharts Stock module
 import { epochConverted } from './globalConfigs';
-import { IChannelMappingResponse, IProps, ISample, ISrcChannel } from './API/interfaces';
+import { IChannelMappingResponse, IProps, ISample, ISrcChannel, IZoomRange } from './API/interfaces';
 
 HighchartsStock(Highcharts); // initialize the Stock module
 
@@ -40,7 +40,7 @@ const DataTypeOne = (props: IProps) => {
                 xAxis: {
                     events: {
                         // afterSetExtremes: syncCharts
-                        setExtremes: function (e: { min: number; max: number; }) {
+                        setExtremes: function (e: IZoomRange) {
                             console.log('e', e);
                             props.onZoomChange(e.min, e.max);
                         },
@@ -83,6 +83,7 @@ const DataTypeOne = (props: IProps) => {
             labels: {
                 rotation: -25,
                 formatter(this: Highcharts.AxisLabelsFormatterContextObject): string {
+                    // Convert the timestamp to a date string
                     return String(this.value);
                 }
             }
@@ -116,6 +117,7 @@ const DataTypeOne = (props: IProps) => {
             {
                 data: channel.data.data,
                 // data: [],
+                name: channel.channel,
                 turboThreshold: 100000,
                 pointPadding: 1,
                 groupPadding: 1,
