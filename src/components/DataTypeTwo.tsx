@@ -4,9 +4,10 @@ import { memo, useContext, useEffect, useRef, useState } from 'react';
 import * as API from './API/API';
 import HighchartsStock from 'highcharts/modules/stock'; // import the Highcharts Stock module
 import { ZoomContext } from './Charts';
+import { IProps } from './API/interfaces';
 
 HighchartsStock(Highcharts); // initialize the Stock module
-const DataTypeTwo = (props: { configs: { chart_title: string; chart_type: string; x_label: string; y_label: string; miniMap: boolean; data_limit: number; src_channels: any[]; }; }) => {
+const DataTypeTwo = (props: IProps) => {
     const { chart_title, chart_type, x_label, y_label, miniMap, data_limit, src_channels } = props.configs;
     const chartRef = useRef<HighchartsReact.Props>(null);
     const [data, setData] = useState<any>([]);
@@ -19,14 +20,6 @@ const DataTypeTwo = (props: { configs: { chart_title: string; chart_type: string
         setStart(newStart);
         // Note: Mapping Data based on src_channels 
         await dataMapping(src_channels, start, newStart, data, setData);
-
-        // Note: Mapping Data based on single channel 
-        // const response = await API.volume(start, newStart);
-        // setOverAllData((prevData: any) => [...prevData, ...response.data]);
-        // const newDataSet = response.data.map((val: { value: any; }) => val.value);
-        // setData((prevData: any) => [...prevData, ...newDataSet]);
-        // const xTimeStamp = response.data.map((val: { ts: any; }) => (val.ts).toFixed(2));
-        // setXAxisCategory((prevData: any) => [...prevData, ...xTimeStamp]);
     };
 
     useEffect(() => {
@@ -36,29 +29,11 @@ const DataTypeTwo = (props: { configs: { chart_title: string; chart_type: string
     useEffect(() => {
         const chart = chartRef.current?.chart;
         if (chart) {
-            const seriesData = data.map((channelData: any) => {
-                const series = {
-                    name: channelData.channel,
-                    data: channelData.data.map((val: { value: any; }) => val?.value),
-                };
-
-                return series;
-            });
-
             const updatedCategories = data.flatMap((channelData: any) => {
                 return channelData.data.map((val: { ts: any; }) => val?.ts);
             });
-            chart.update({ series: seriesData }, false);
             setSetXCategory(updatedCategories);
-            chart.xAxis[0].setCategories(updatedCategories, false);
-            chart.redraw();
 
-            // Update the navigator to display the new range
-            var xAxis = chart.xAxis[0];
-            var dataMin = xAxis.dataMin;
-            var dataMax = xAxis.dataMax;
-            var navigator = chart.navigator;
-            navigator.xAxis.setExtremes(dataMin, dataMax);
 
 
             chart.update({
@@ -91,7 +66,6 @@ const DataTypeTwo = (props: { configs: { chart_title: string; chart_type: string
 
     const options = {
         chart: {
-            // type: "line",
             type: String(chart_type),
             // animation: Highcharts.svg, // don't animate in old IE
             marginRight: 10,
@@ -103,8 +77,6 @@ const DataTypeTwo = (props: { configs: { chart_title: string; chart_type: string
             text: String(chart_title),
         },
         xAxis: {
-            // tickPixelInterval: 100,
-            // tickmarkPlacement: 'on',
             labels: {
                 rotation: -10,
                 formatter(this: any): string {
@@ -116,15 +88,11 @@ const DataTypeTwo = (props: { configs: { chart_title: string; chart_type: string
                 text: String(x_label),
             },
             tickLength: 10,
-            // categories: [],
-            // categories: x.data.map((y: { value: any; }) => y.value),
             categories: setXCategory,
         },
         yAxis: {
             lineWidth: 1,
             opposite: false,
-
-            // categories: xAxisCategory,
             // type: 'logarithmic',
             title: {
                 text: String(y_label),
@@ -154,8 +122,8 @@ const DataTypeTwo = (props: { configs: { chart_title: string; chart_type: string
         },
         series: data.map((x: any) => (
             {
-
-                data: x.data.map((y: { value: any; }) => y.value),
+                data: x.data.map((y: any) => y.value),
+                name: x.channel,
                 turboThreshold: 100000,
                 pointPadding: 1,
                 groupPadding: 1,
@@ -174,7 +142,11 @@ const DataTypeTwo = (props: { configs: { chart_title: string; chart_type: string
                 },
             }
         )),
-
+        navigation: {
+            buttonOptions: {
+                enabled: true
+            }
+        },
         navigator: {
             enabled: Boolean(miniMap), // enable the navigator
             adaptToUpdatedData: true,
@@ -182,7 +154,7 @@ const DataTypeTwo = (props: { configs: { chart_title: string; chart_type: string
                 labels: {
                     formatter(this: any): string {
                         const xValue = this.value;
-                        return (data[0]?.data[xValue])[0];
+                        return (setXCategory[xValue]);
                     },
                 },
             }

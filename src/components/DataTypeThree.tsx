@@ -3,14 +3,16 @@ import Highcharts from 'highcharts';
 import { memo, useEffect, useRef, useState } from 'react';
 import * as API from './API/API';
 import HighchartsStock from 'highcharts/modules/stock'; // import the Highcharts Stock module
+import { IProps } from './API/interfaces';
 
 HighchartsStock(Highcharts); // initialize the Stock module
 
-const DataTypeThree = (props: { configs: { chart_title: any; chart_type: any; x_label: any; y_label: any; miniMap: any; data_limit: any; src_channels: any; }; }) => {
+const DataTypeThree = (props: IProps) => {
     const { chart_title, chart_type, x_label, y_label, miniMap, data_limit, src_channels } = props.configs;
     const chartRef = useRef<HighchartsReact.Props>(null);
     const [start, setStart] = useState(0);
     const [data, setData] = useState<any[]>([]);
+    const [setXCategory, setSetXCategory] = useState<any>([]);
 
     const fetchData = async () => {
         const newStart = start + data_limit;
@@ -43,9 +45,23 @@ const DataTypeThree = (props: { configs: { chart_title: any; chart_type: any; x_
             const updatedCategories = data.flatMap((channelData: any) => {
                 return channelData.data.map((val: { ts: number; }) => val?.ts.toFixed(2));
             });
+            setSetXCategory(updatedCategories);
 
             chart.update({ series: seriesData }, false);
             chart.xAxis[0].setCategories(updatedCategories, false);
+
+
+            chart.update({
+                xAxis: {
+                    events: {
+                        // afterSetExtremes: syncCharts
+                        setExtremes: function (e: { min: any; max: any; }) {
+                            props.onZoomChange(e.min, e.max);
+                        },
+                    }
+                },
+            });
+
             chart.redraw();
         }
     }, [data]);
@@ -67,7 +83,8 @@ const DataTypeThree = (props: { configs: { chart_title: any; chart_type: any; x_
             text: String(chart_title),
         },
         xAxis: {
-            categories: [],
+            // categories: [],
+            categories: setXCategory,
             // ordinal: false,
             title: {
                 text: String(x_label),
@@ -123,7 +140,7 @@ const DataTypeThree = (props: { configs: { chart_title: any; chart_type: any; x_
         series: data.map((x: any) => (
             {
 
-                data: x.data.map((x: { ts: string; }) => x?.ts),
+                data: x.data.map((x: { values: { mean: string; }; }) => x.values.mean),
                 turboThreshold: 100000,
                 pointPadding: 1,
                 groupPadding: 1,

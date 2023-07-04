@@ -6,13 +6,14 @@ import xrange from "highcharts/modules/xrange";
 import HighchartsBoost from 'highcharts/modules/boost';
 import HighchartsStock from 'highcharts/modules/stock'; // import the Highcharts Stock module
 import { ZoomContext } from './Charts';
+import { IProps } from './API/interfaces';
 
 HighchartsStock(Highcharts); // initialize the Stock module
 xrange(Highcharts);
 HighchartsBoost(Highcharts);
 let Yaxis: any = [];
 
-const DataTypeFour = (props: { configs: { chart_title: string; chart_type: string; x_label: string; y_label: string; miniMap: boolean; data_limit: number; src_channels: any[]; }; }) => {
+const DataTypeFour = (props: IProps) => {
     const { chart_title, chart_type, x_label, y_label, miniMap, data_limit, src_channels } = props.configs;
     const chartRef = useRef<HighchartsReact.Props>(null);
     const [data, setData] = useState<any>([]);
@@ -24,31 +25,7 @@ const DataTypeFour = (props: { configs: { chart_title: string; chart_type: strin
     const fetchData = async () => {
         const newStart = start + data_limit;
         setStart(newStart);
-
-        await dataMapping(src_channels, start, newStart, data, setData);
-
-        // const response = await API.annot(start, newStart);
-
-        // response.data?.map((singleChannelData: {
-        //     bt: number;
-        //     tt: number;
-        //     tag(tag: string): unknown; data: any;
-        // }) => {
-
-        //     Yaxis.push(singleChannelData.tag);
-        //     uniqueArray = [...new Set(Yaxis)];
-        //     setXAxisCategory(uniqueArray);
-        //     const chartData = {
-        //         x: singleChannelData.bt,
-        //         x2: singleChannelData.tt,
-        //         // y: singleChannelData?.tag === 'normal' ? 1 : 0,
-        //         y: uniqueArray.indexOf(singleChannelData.tag),
-        //         title: singleChannelData.tag,
-        //     };
-        //     setData((prevData: any) => [...prevData, chartData]);
-        // });
-
-
+        await channelMapping(src_channels, start, newStart, data, setData);
     };
 
     useEffect(() => {
@@ -58,46 +35,18 @@ const DataTypeFour = (props: { configs: { chart_title: string; chart_type: strin
     useEffect(() => {
         const chart = chartRef.current?.chart;
         if (chart && data) {
-            let uniqueArray: string | unknown[];
-            data.map((channelData: { data: { bt: number; tt: number; tag(tag: string): unknown; data: any; }[]; }) => {
-                channelData?.data?.map((singleChannelData: {
-                    bt: number;
-                    tt: number;
-                    tag(tag: string): unknown; data: any;
-                }) => {
-                    Yaxis.push(singleChannelData.tag);
-                    uniqueArray = [...new Set(Yaxis)];
-                    setXAxisCategory(uniqueArray);
-                    const chartData = {
-                        x: singleChannelData.bt,
-                        x2: singleChannelData.tt,
-                        // y: singleChannelData?.tag === 'normal' ? 1 : 0,
-                        y: uniqueArray.indexOf(singleChannelData.tag),
-                        title: singleChannelData.tag,
-                    };
-                    setPlotting((prevData: any) => [...prevData, chartData]);
-                    // setPlotting([chartData]);
-                });
+            dataMapping(data, setXAxisCategory, setPlotting);
+
+            chart.update({
+                xAxis: {
+                    events: {
+                        // afterSetExtremes: syncCharts
+                        setExtremes: function (e: { min: any; max: any; }) {
+                            props.onZoomChange(e.min, e.max);
+                        },
+                    }
+                },
             });
-
-
-            // chart.update({
-            //     series: [
-            //         {
-            //             data: data,
-            //         },
-            //     ],
-            // });
-            // chart.update({
-            //     xAxis: {
-            //         events: {
-            //             // afterSetExtremes: syncCharts
-            //             setExtremes: function (e) {
-            //                 props.onZoomChange(e.min, e.max);
-            //             },
-            //         }
-            //     },
-            // });
         }
     }, [data]);
 
@@ -235,7 +184,30 @@ const DataTypeFour = (props: { configs: { chart_title: string; chart_type: strin
 
 export default memo(DataTypeFour);
 
-async function dataMapping(src_channels: any, start: number, newStart: any, data: any, setData: { (value: any): void; (arg0: any[]): void; }) {
+function dataMapping(data: any, setXAxisCategory: { (value: any): void; (arg0: unknown[]): void; }, setPlotting: { (value: any): void; (arg0: (prevData: any) => any[]): void; }) {
+    let uniqueArray: string | unknown[];
+    data.map((channelData: { data: { bt: number; tt: number; tag(tag: string): unknown; data: any; }[]; }) => {
+        channelData?.data?.map((singleChannelData: {
+            bt: number;
+            tt: number;
+            tag(tag: string): unknown; data: any;
+        }) => {
+            Yaxis.push(singleChannelData.tag);
+            uniqueArray = [...new Set(Yaxis)];
+            setXAxisCategory(uniqueArray);
+            const chartData = {
+                x: singleChannelData.bt,
+                x2: singleChannelData.tt,
+                // y: singleChannelData?.tag === 'normal' ? 1 : 0,
+                y: uniqueArray.indexOf(singleChannelData.tag),
+                title: singleChannelData.tag,
+            };
+            setPlotting((prevData: any) => [...prevData, chartData]);
+        });
+    });
+}
+
+async function channelMapping(src_channels: any, start: number, newStart: any, data: any, setData: { (value: any): void; (arg0: any[]): void; }) {
     const promises = src_channels.map(async (eachChannel: { channel: string; }) => {
         const response = await API.getData(eachChannel.channel, start, newStart);
         // const seriesData = response.data.map((item: any) => [item.ts, item]);

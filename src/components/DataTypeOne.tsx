@@ -3,23 +3,22 @@ import Highcharts from 'highcharts';
 import { memo, useEffect, useRef, useState } from 'react';
 import * as API from './API/API';
 import HighchartsStock from 'highcharts/modules/stock'; // import the Highcharts Stock module
+import { epochConverted } from './globalConfigs';
+import { IProps } from './API/interfaces';
 
 HighchartsStock(Highcharts); // initialize the Stock module
 
-const DataTypeOne = (props: { configs: { chart_title: string; chart_type: string; x_label: string; y_label: string; miniMap: boolean; data_limit: number; src_channels: any; }; }) => {
+const DataTypeOne = (props: IProps) => {
     const { chart_title, chart_type, x_label, y_label, miniMap, data_limit, src_channels } = props.configs;
     const chartRef = useRef<HighchartsReact.Props>(null);
     const [data, setData] = useState<any>([]);
     const [start, setStart] = useState(0);
+    const [setXCategory, setSetXCategory] = useState<any>([]);
 
     const fetchData = async () => {
         const newStart = start + data_limit;
         setStart(newStart);
-        await dataMapping(src_channels, start, newStart, data, setData);
-
-        // const response = await API.waveForm(start, newStart);
-        // setData((prevData: any) => [...prevData, ...response.data]);
-
+        await channelMapping(src_channels, start, newStart, data, setData);
     };
 
     useEffect(() => {
@@ -29,46 +28,30 @@ const DataTypeOne = (props: { configs: { chart_title: string; chart_type: string
     useEffect(() => {
         const chart = chartRef.current?.chart;
         if (chart) {
-            const updatedSeries = data.map((channel: any) => {
-                let { data, sr, ts } = channel.data;
+            const updatedSeries = dataMapping(data);
+            const yAxisData = updatedSeries?.flat().map((series: any) => series.value);
+            const xAxisTs = updatedSeries?.flat().map((series: any) => series.time);
+            setSetXCategory(xAxisTs);
+            chart.update({ series: [{ data: yAxisData }] }, false);
 
-                let timeDifferBetweenSamples = sr / (1000 * 1000);
-                let sampleTime = ts;
-                let sampledData: any = [];
-                data.forEach((sampleValue: number, index: number) => {
-                    if (index !== 0) {
-                        sampleTime = sampleTime + timeDifferBetweenSamples;
+
+            chart.update({
+                xAxis: {
+                    events: {
+                        // afterSetExtremes: syncCharts
+                        setExtremes: function (e: { min: any; max: any; }) {
+                            console.log('e', e);
+                            props.onZoomChange(e.min, e.max);
+                        },
                     }
-                    let sample = { value: sampleValue, time: sampleTime };
-                    sampledData.push(sample);
-                });
-                return {
-                    sampledData
-                };
+                },
             });
 
-            const dra = updatedSeries?.map((series: any) => {
-                return series.sampledData.map(x => x.value);
-            });
-
-            const vv = updatedSeries?.map((series: any) => {
-                return series.sampledData.map(x => epochConverted(x.time));
-            });
-            // const vv = updatedSeries?.map((series: any) => series.sampleData?.map((s: any) => { s.time; })
-            // );
-            // const vv = updatedSeries?.local?.map((series: any) => series.data.map(val => val.time));
-            chart.xAxis[0].setCategories(vv[0], false);
-            chart.update({ series: [{ data: dra[0] }] }, false);
-            chart.redraw();
+            // chart.redraw();
         }
     }, [data]);
 
-    const epochConverted = (time: number) => {
-        const epochTime = time;
-        const date = new Date(epochTime);
-        const localISOTimeString = date.toLocaleString();
-        return (localISOTimeString.split(',')[1]).trim();
-    };
+
 
     const handlePan = () => {
         fetchData();
@@ -93,8 +76,9 @@ const DataTypeOne = (props: { configs: { chart_title: string; chart_type: string
             title: {
                 text: String(x_label)
             },
-            // tickLength: 10,
-            categories: [],
+            // categories: [],
+            categories: setXCategory,
+
             labels: {
                 rotation: -25,
                 formatter(this: any): string {
@@ -128,10 +112,11 @@ const DataTypeOne = (props: { configs: { chart_title: string; chart_type: string
         exporting: {
             enabled: true,
         },
-        series: data.map((_) => (
+        series: data.map((x: { data: { data: any; }; }) => (
+            (console.log('x', x.data.data)),
             {
 
-                data: [],
+                data: x.data.data,
                 // data: [],
                 turboThreshold: 100000,
                 pointPadding: 1,
@@ -186,7 +171,25 @@ const DataTypeOne = (props: { configs: { chart_title: string; chart_type: string
 
 export default memo(DataTypeOne);
 
-async function dataMapping(src_channels: any, start: number, newStart: any, data: any, setData: { (value: any): void; (arg0: any[]): void; }) {
+function dataMapping(data: any) {
+    return data.map((channel: any) => {
+        let { data, sr, ts } = channel.data;
+
+        let timeDifferBetweenSamples = sr / (1000 * 1000);
+        let sampleTime = ts;
+        let sampledData: any = [];
+        data.forEach((sampleValue: number, index: number) => {
+            if (index !== 0) {
+                sampleTime = sampleTime + timeDifferBetweenSamples;
+            }
+            let sample = { value: sampleValue, time: epochConverted(sampleTime) };
+            sampledData.push(sample);
+        });
+        return sampledData;
+    });
+}
+
+async function channelMapping(src_channels: any, start: number, newStart: any, data: any, setData: { (value: any): void; (arg0: any[]): void; }) {
     const promises = src_channels.map(async (eachChannel: { channel: string; }) => {
         const response = await API.getData(eachChannel.channel, start, newStart);
         return {
