@@ -19,6 +19,7 @@ interface ISample {
 }
 
 interface IChannelData {
+    channel: any;
     data: number[];
     sr: number;
     ts: number;
@@ -39,4 +40,10 @@ interface IZoomRange {
     max: number;
 }
 
-export type { IProps, IViewProps, ISample, IChannelData, IChannelMappingResponse, ISrcChannel, IZoomRange };
+interface IDataElement {
+    ts: string;
+    value: number;
+}
+
+
+export type { IProps, IViewProps, ISample, IChannelData, IChannelMappingResponse, ISrcChannel, IZoomRange, IDataElement };

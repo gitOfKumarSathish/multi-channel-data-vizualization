@@ -7,7 +7,7 @@ import DataTypeOne from './DataTypeOne';
 import { IViewProps, IZoomRange } from './API/interfaces';
 
 
-export const ZoomContext = React.createContext();
+export const ZoomContext = React.createContext<IZoomRange | null>(null);
 export default function Charts() {
     const [viewConfigs, setViewConfigs] = useState([]);
     const [zoomLevel, setZoomLevel] = useState<IZoomRange>();

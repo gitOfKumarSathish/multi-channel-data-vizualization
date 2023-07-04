@@ -4,13 +4,13 @@ import { memo, useContext, useEffect, useRef, useState } from 'react';
 import * as API from './API/API';
 import HighchartsStock from 'highcharts/modules/stock'; // import the Highcharts Stock module
 import { ZoomContext } from './Charts';
-import { IChannelData, IProps, ISrcChannel, IZoomRange } from './API/interfaces';
+import { IChannelData, IDataElement, IProps, ISrcChannel, IZoomRange } from './API/interfaces';
 
 HighchartsStock(Highcharts); // initialize the Stock module
 const DataTypeTwo = (props: IProps) => {
     const { chart_title, chart_type, x_label, y_label, miniMap, data_limit, src_channels } = props.configs;
     const chartRef = useRef<HighchartsReact.Props>(null);
-    const [data, setData] = useState<any>([]);
+    const [data, setData] = useState<IChannelData[]>([]);
     const [start, setStart] = useState(0);
     const [setXCategory, setSetXCategory] = useState<string[]>([]);
     const zoomLevel = useContext(ZoomContext);
@@ -29,8 +29,8 @@ const DataTypeTwo = (props: IProps) => {
     useEffect(() => {
         const chart = chartRef.current?.chart;
         if (chart) {
-            const updatedCategories = data.flatMap((channelData: any) => {
-                return channelData.data.map((val: { ts: any; }) => val?.ts);
+            const updatedCategories = data.flatMap((channelData: IChannelData) => {
+                return channelData.data.map((val: IDataElement) => val.ts);
             });
             setSetXCategory(updatedCategories);
 
@@ -116,7 +116,7 @@ const DataTypeTwo = (props: IProps) => {
         exporting: {
             enabled: true,
         },
-        series: data.map((x: any) => (
+        series: data.map((x: IChannelData) => (
             {
                 data: x.data.map((y: any) => y.value),
                 name: x.channel,
@@ -181,7 +181,7 @@ const DataTypeTwo = (props: IProps) => {
 
 export default memo(DataTypeTwo);
 
-async function channelMapping(src_channels: ISrcChannel[], start: number, newStart: number, data: any, setData: { (value: any): void; (arg0: any[]): void; }) {
+async function channelMapping(src_channels: ISrcChannel[], start: number, newStart: number, data: any[], setData: (value: any) => void) {
     const promises = src_channels.map(async (eachChannel: { channel: string; }) => {
         const response = await API.getData(eachChannel.channel, start, newStart);
         return {
