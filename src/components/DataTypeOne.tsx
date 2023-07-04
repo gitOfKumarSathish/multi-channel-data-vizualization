@@ -76,7 +76,29 @@ const DataTypeOne = (props: IProps) => {
             marginRight: 10,
             zoomType: "x",
             panning: true,
-            panKey: 'shift'
+            panKey: 'shift',
+            resetZoomButton: {
+                position: {
+                    align: 'right',
+                    verticalAlign: 'top',
+                    x: -10,
+                    y: 10
+                },
+                theme: {
+                    fill: 'white',
+                    stroke: 'silver',
+                    r: 0,
+                    states: {
+                        hover: {
+                            fill: '#41739D',
+                            style: {
+                                color: 'white'
+                            }
+                        }
+                    }
+                },
+                relativeTo: 'chart'
+            }
         },
         title: {
             text: String(chart_title),
@@ -141,7 +163,6 @@ const DataTypeOne = (props: IProps) => {
                         fontWeight: 'bold',
                     },
                     formatter(this: Highcharts.AxisLabelsFormatterContextObject): string {
-                        console.log('sasasasa', this);
                         // return this.point?.title;
                         return String(this.value);
                     }
@@ -155,8 +176,8 @@ const DataTypeOne = (props: IProps) => {
                 labels: {
                     formatter(this: Highcharts.AxisLabelsFormatterContextObject): string | number {
                         // Format the label based on the x-axis value
-                        const xValue = this.value;
-                        return xValue;
+                        const xValue: any = this.value || '';
+                        return setXCategory[xValue];
                     },
                 },
             }
