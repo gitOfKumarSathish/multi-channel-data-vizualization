@@ -98,7 +98,7 @@ const DataTypeThree = (props: IProps) => {
         },
         tooltip: {
             shared: true,
-            ormatter(this: Highcharts.TooltipFormatterContextObject): string {
+            formatter(this: Highcharts.TooltipFormatterContextObject): string {
                 const xValue: any = this?.x;
                 const finalToolTipFormat = data.map((channelData) => {
                     const correspondingData = channelData.data.find((data: IDataElementTypeThree) => {
