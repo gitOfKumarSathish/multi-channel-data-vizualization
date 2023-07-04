@@ -13,8 +13,8 @@ const DataTypeThree = (props: IProps) => {
     const { chart_title, chart_type, x_label, y_label, miniMap, data_limit, src_channels } = props.configs;
     const chartRef = useRef<HighchartsReact.Props>(null);
     const [start, setStart] = useState(0);
-    const [data, setData] = useState<any[]>([]);
-    const [setXCategory, setSetXCategory] = useState<any>([]);
+    const [data, setData] = useState<IChartData[]>([]);
+    const [setXCategory, setSetXCategory] = useState<string[]>([]);
     const zoomLevel = useContext(ZoomContext);
 
     const fetchData = async () => {
@@ -99,7 +99,7 @@ const DataTypeThree = (props: IProps) => {
         tooltip: {
             shared: true,
             formatter(this: Highcharts.TooltipFormatterContextObject): string {
-                const xValue: any = this?.x;
+                const xValue = this?.x || "";
                 const finalToolTipFormat = data.map((channelData) => {
                     const correspondingData = channelData.data.find((data: IDataElementTypeThree) => {
                         return (data.ts)?.toFixed(2) === xValue.toString();
@@ -154,11 +154,11 @@ const DataTypeThree = (props: IProps) => {
             adaptToUpdatedData: true,
             xAxis: {
                 labels: {
-                    formatter(this: Highcharts.AxisLabelsFormatterContextObject): string {
-                        const xValue = this.value;
+                    formatter(this: Highcharts.AxisLabelsFormatterContextObject): number {
+                        const xValue: number = Number(this.value);
                         const finalToolTipFormat = data.map((channelData) => {
                             // Format the label based on the x-axis value
-                            const correspondingData = channelData.data[xValue];
+                            const correspondingData = channelData.data[Number(xValue)];
                             return correspondingData?.ts;
                         });
                         return finalToolTipFormat[0];
@@ -189,18 +189,18 @@ const DataTypeThree = (props: IProps) => {
 
 export default memo(DataTypeThree);
 
-function dataMapping(data: any[], setSetXCategory: { (value: any): void; (arg0: any[]): void; }, chart: any) {
-    const seriesData = data.map((channelData: any) => {
+function dataMapping(data: IChartData[], setSetXCategory: (value: string[]) => void, chart: any) {
+    const seriesData = data.map((channelData: IChartData) => {
         const series = {
             name: channelData.channel,
-            data: channelData.data.map((val: { values: { mean: any; }; }) => val?.values?.mean),
+            data: channelData.data.map((val: IDataElementTypeThree) => val?.values?.mean),
         };
 
         return series;
     });
 
-    const updatedCategories = data.flatMap((channelData: any) => {
-        return channelData.data.map((val: { ts: number; }) => val?.ts.toFixed(2));
+    const updatedCategories = data.flatMap((channelData: IChartData) => {
+        return channelData.data.map((val) => val?.ts.toFixed(2));
     });
     setSetXCategory(updatedCategories);
 
@@ -208,7 +208,7 @@ function dataMapping(data: any[], setSetXCategory: { (value: any): void; (arg0: 
     chart.xAxis[0].setCategories(updatedCategories, false);
 }
 
-async function channelMapping(src_channels: ISrcChannel[], start: number, newStart: number, data: any, setData: (value: any[]) => void) {
+async function channelMapping(src_channels: ISrcChannel[], start: number, newStart: number, data: IChartData[], setData: (value: IChartData[]) => void) {
     const promises = src_channels.map(async (eachChannel: { channel: string; }) => {
         const response = await API.getData(eachChannel.channel, start, newStart);
         return {
@@ -219,8 +219,8 @@ async function channelMapping(src_channels: ISrcChannel[], start: number, newSta
 
     try {
         const responses = await Promise.all(promises);
-        responses.forEach((response: any) => {
-            const existingChannelIndex = data.findIndex((item: any) => item.channel === response.channel);
+        responses.forEach((response) => {
+            const existingChannelIndex = data.findIndex((item) => item.channel === response.channel);
 
             if (existingChannelIndex !== -1) {
                 data[existingChannelIndex].data = [...data[existingChannelIndex].data, ...response.data];

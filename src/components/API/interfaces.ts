@@ -47,13 +47,15 @@ interface IDataElement {
 }
 
 interface IDataElementTypeThree {
+    ts: number;
     values: {
         mean: string;
+        std: string;
     };
-    ts: string;
 }
 
 interface IChartData {
+    ts?: any;
     channel: string;
     data: IDataElementTypeThree[];
 }
