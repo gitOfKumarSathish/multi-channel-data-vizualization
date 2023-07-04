@@ -4,11 +4,12 @@ import DataTypeTwo from './DataTypeTwo';
 import DataTypeFour from './DataTypeFour';
 import DataTypeThree from './DataTypeThree';
 import DataTypeOne from './DataTypeOne';
+import { IViewProps } from './API/interfaces';
 
 
 export const ZoomContext = React.createContext();
 export default function Charts() {
-    const [viewConfigs, setViewConfigs] = useState<any>([]);
+    const [viewConfigs, setViewConfigs] = useState([]);
     const [zoomLevel, setZoomLevel] = useState<any>(null);
 
     const handleZoomChange = (min: number, max: number) => {
@@ -24,7 +25,7 @@ export default function Charts() {
     };
 
     const chartChannel = () => {
-        return viewConfigs.map((viewConfig: { src_channels?: any; data_type?: any; chart_type?: any; x_label?: any; y_label?: any; chart?: any; }, index: number) => {
+        return viewConfigs.map((viewConfig: IViewProps, index: number) => {
             const { data_type } = viewConfig;
             if (data_type === "volume") {
                 return <DataTypeTwo key={index} configs={viewConfig} onZoomChange={handleZoomChange} />;

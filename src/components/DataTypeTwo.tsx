@@ -19,7 +19,7 @@ const DataTypeTwo = (props: IProps) => {
         const newStart = start + data_limit;
         setStart(newStart);
         // Note: Mapping Data based on src_channels 
-        await dataMapping(src_channels, start, newStart, data, setData);
+        await channelMapping(src_channels, start, newStart, data, setData);
     };
 
     useEffect(() => {
@@ -182,7 +182,7 @@ const DataTypeTwo = (props: IProps) => {
 
 export default memo(DataTypeTwo);
 
-async function dataMapping(src_channels: any, start: number, newStart: any, data: any, setData: { (value: any): void; (arg0: any[]): void; }) {
+async function channelMapping(src_channels: any, start: number, newStart: any, data: any, setData: { (value: any): void; (arg0: any[]): void; }) {
     const promises = src_channels.map(async (eachChannel: { channel: string; }) => {
         const response = await API.getData(eachChannel.channel, start, newStart);
         // const seriesData = response.data.map((item: any) => [item.ts, item.value]);
