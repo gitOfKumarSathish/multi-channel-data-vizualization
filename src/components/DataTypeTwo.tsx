@@ -34,8 +34,6 @@ const DataTypeTwo = (props: IProps) => {
             });
             setSetXCategory(updatedCategories);
 
-
-
             chart.update({
                 xAxis: {
                     events: {

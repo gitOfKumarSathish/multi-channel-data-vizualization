@@ -25,6 +25,7 @@ const DataTypeFour = (props: IProps) => {
     const fetchData = async () => {
         const newStart = start + data_limit;
         setStart(newStart);
+        // Note: Mapping Data based on src_channels 
         await channelMapping(src_channels, start, newStart, data, setData);
     };
 

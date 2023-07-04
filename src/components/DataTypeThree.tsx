@@ -18,7 +18,7 @@ const DataTypeThree = (props: IProps) => {
         const newStart = start + data_limit;
         setStart(newStart);
 
-        // Data Mapping 
+        // Note: Mapping Data based on src_channels 
         await channelMapping(src_channels, start, newStart, data, setData);
     };
 
@@ -29,28 +29,7 @@ const DataTypeThree = (props: IProps) => {
     useEffect(() => {
         const chart = chartRef.current?.chart;
         if (chart) {
-            // chart.update({ series: [{ data }] }, false);
-            // chart.xAxis[0].setCategories(xAxisCategory, false);
-            // chart.redraw();
-
-            const seriesData = data.map((channelData: any) => {
-                const series = {
-                    name: channelData.channel,
-                    data: channelData.data.map((val: { values: { mean: any; }; }) => val?.values?.mean),
-                };
-
-                return series;
-            });
-
-            const updatedCategories = data.flatMap((channelData: any) => {
-                return channelData.data.map((val: { ts: number; }) => val?.ts.toFixed(2));
-            });
-            setSetXCategory(updatedCategories);
-
-            chart.update({ series: seriesData }, false);
-            chart.xAxis[0].setCategories(updatedCategories, false);
-
-
+            dataMapping(data, setSetXCategory, chart);
             chart.update({
                 xAxis: {
                     events: {
@@ -198,6 +177,25 @@ const DataTypeThree = (props: IProps) => {
 };
 
 export default memo(DataTypeThree);
+
+function dataMapping(data: any[], setSetXCategory, chart: any) {
+    const seriesData = data.map((channelData: any) => {
+        const series = {
+            name: channelData.channel,
+            data: channelData.data.map((val: { values: { mean: any; }; }) => val?.values?.mean),
+        };
+
+        return series;
+    });
+
+    const updatedCategories = data.flatMap((channelData: any) => {
+        return channelData.data.map((val: { ts: number; }) => val?.ts.toFixed(2));
+    });
+    setSetXCategory(updatedCategories);
+
+    chart.update({ series: seriesData }, false);
+    chart.xAxis[0].setCategories(updatedCategories, false);
+}
 
 async function channelMapping(src_channels: any, start: number, newStart: any, data: any, setData: { (value: any): void; (arg0: any[]): void; }) {
     const promises = src_channels.map(async (eachChannel: { channel: string; }) => {
