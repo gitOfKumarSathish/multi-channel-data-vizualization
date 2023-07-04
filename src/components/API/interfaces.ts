@@ -6,6 +6,7 @@ interface IViewProps {
     miniMap: boolean;
     data_limit: number;
     src_channels: ISrcChannel[];
+    data_type: string;
 }
 
 interface IProps {
@@ -45,5 +46,17 @@ interface IDataElement {
     value: number;
 }
 
+interface IDataElementTypeThree {
+    values: {
+        mean: string;
+    };
+    ts: string;
+}
 
-export type { IProps, IViewProps, ISample, IChannelData, IChannelMappingResponse, ISrcChannel, IZoomRange, IDataElement };
+interface IChartData {
+    channel: string;
+    data: IDataElementTypeThree[];
+}
+
+
+export type { IProps, IViewProps, ISample, IChannelData, IChannelMappingResponse, ISrcChannel, IZoomRange, IDataElement, IDataElementTypeThree, IChartData };

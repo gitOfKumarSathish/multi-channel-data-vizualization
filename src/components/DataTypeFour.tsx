@@ -42,7 +42,7 @@ const DataTypeFour = (props: IProps) => {
                 xAxis: {
                     events: {
                         // afterSetExtremes: syncCharts
-                        setExtremes: function (e: { min: any; max: any; }) {
+                        afterSetExtremes: function (e: { min: any; max: any; }) {
                             props.onZoomChange(e.min, e.max);
                         },
                     }
@@ -53,7 +53,6 @@ const DataTypeFour = (props: IProps) => {
 
     useEffect(() => {
         const chart = chartRef.current?.chart;
-        console.log('why chart');
         if (chart && zoomLevel) {
             chart.xAxis[0].setExtremes(zoomLevel.min, zoomLevel.max);
         }

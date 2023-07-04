@@ -38,7 +38,7 @@ const DataTypeTwo = (props: IProps) => {
                 xAxis: {
                     events: {
                         // afterSetExtremes: syncCharts
-                        setExtremes: function (e: IZoomRange) {
+                        afterSetExtremes: function (e: IZoomRange) {
                             props.onZoomChange(e.min, e.max);
                         },
                     }

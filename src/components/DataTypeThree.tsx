@@ -3,7 +3,9 @@ import Highcharts from 'highcharts';
 import { memo, useEffect, useRef, useState } from 'react';
 import * as API from './API/API';
 import HighchartsStock from 'highcharts/modules/stock'; // import the Highcharts Stock module
-import { IProps, IZoomRange } from './API/interfaces';
+import { IChartData, IDataElementTypeThree, IProps, ISrcChannel, IZoomRange } from './API/interfaces';
+import { useContext } from 'react';
+import { ZoomContext } from './Charts';
 
 HighchartsStock(Highcharts); // initialize the Stock module
 
@@ -13,6 +15,7 @@ const DataTypeThree = (props: IProps) => {
     const [start, setStart] = useState(0);
     const [data, setData] = useState<any[]>([]);
     const [setXCategory, setSetXCategory] = useState<any>([]);
+    const zoomLevel = useContext(ZoomContext);
 
     const fetchData = async () => {
         const newStart = start + data_limit;
@@ -34,7 +37,7 @@ const DataTypeThree = (props: IProps) => {
                 xAxis: {
                     events: {
                         // afterSetExtremes: syncCharts
-                        setExtremes: function (e: IZoomRange) {
+                        afterSetExtremes: function (e: IZoomRange) {
                             props.onZoomChange(e.min, e.max);
                         },
                     }
@@ -44,6 +47,14 @@ const DataTypeThree = (props: IProps) => {
             chart.redraw();
         }
     }, [data]);
+
+
+    useEffect(() => {
+        const chart = chartRef.current?.chart;
+        if (chart && zoomLevel) {
+            chart.xAxis[0].setExtremes(zoomLevel.min, zoomLevel.max);
+        }
+    }, [zoomLevel]);
 
     const handlePan = () => {
         fetchData();
@@ -70,9 +81,9 @@ const DataTypeThree = (props: IProps) => {
             },
             labels: {
                 rotation: -10,
-                formatter(this: any): string {
+                ormatter(this: Highcharts.AxisLabelsFormatterContextObject): string {
                     // Convert the timestamp to a date string
-                    return this.value;
+                    return String(this.value);
                 }
             },
             tickLength: 10,
@@ -87,11 +98,11 @@ const DataTypeThree = (props: IProps) => {
         },
         tooltip: {
             shared: true,
-            formatter(this: any): string {
-                const xValue = this.x;
+            ormatter(this: Highcharts.TooltipFormatterContextObject): string {
+                const xValue: any = this?.x;
                 const finalToolTipFormat = data.map((channelData) => {
-                    const correspondingData = channelData.data.find((data: any) => {
-                        return data.ts.toFixed(2) === xValue.toString();
+                    const correspondingData = channelData.data.find((data: IDataElementTypeThree) => {
+                        return (data.ts)?.toFixed(2) === xValue.toString();
                     });
                     // Generate the tooltip content using the corresponding data
                     let tooltipContent: string = '';
@@ -116,7 +127,7 @@ const DataTypeThree = (props: IProps) => {
         exporting: {
             enabled: true,
         },
-        series: data.map((x: any) => (
+        series: data.map((x: IChartData) => (
             {
 
                 data: x.data.map((x: { values: { mean: string; }; }) => x.values.mean),
@@ -143,7 +154,7 @@ const DataTypeThree = (props: IProps) => {
             adaptToUpdatedData: true,
             xAxis: {
                 labels: {
-                    formatter(this: any): string {
+                    formatter(this: Highcharts.AxisLabelsFormatterContextObject): string {
                         const xValue = this.value;
                         const finalToolTipFormat = data.map((channelData) => {
                             // Format the label based on the x-axis value
@@ -178,7 +189,7 @@ const DataTypeThree = (props: IProps) => {
 
 export default memo(DataTypeThree);
 
-function dataMapping(data: any[], setSetXCategory, chart: any) {
+function dataMapping(data: any[], setSetXCategory: { (value: any): void; (arg0: any[]): void; }, chart: any) {
     const seriesData = data.map((channelData: any) => {
         const series = {
             name: channelData.channel,
@@ -197,7 +208,7 @@ function dataMapping(data: any[], setSetXCategory, chart: any) {
     chart.xAxis[0].setCategories(updatedCategories, false);
 }
 
-async function channelMapping(src_channels: any, start: number, newStart: any, data: any, setData: { (value: any): void; (arg0: any[]): void; }) {
+async function channelMapping(src_channels: ISrcChannel[], start: number, newStart: number, data: any, setData: (value: any[]) => void) {
     const promises = src_channels.map(async (eachChannel: { channel: string; }) => {
         const response = await API.getData(eachChannel.channel, start, newStart);
         return {

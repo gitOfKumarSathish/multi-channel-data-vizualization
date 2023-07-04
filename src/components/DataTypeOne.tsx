@@ -1,10 +1,11 @@
 import HighchartsReact from 'highcharts-react-official';
 import Highcharts from 'highcharts';
-import { memo, useEffect, useRef, useState } from 'react';
+import { memo, useContext, useEffect, useRef, useState } from 'react';
 import * as API from './API/API';
 import HighchartsStock from 'highcharts/modules/stock'; // import the Highcharts Stock module
 import { epochConverted } from './globalConfigs';
 import { IChannelMappingResponse, IProps, ISample, ISrcChannel, IZoomRange } from './API/interfaces';
+import { ZoomContext } from './Charts';
 
 HighchartsStock(Highcharts); // initialize the Stock module
 
@@ -14,6 +15,7 @@ const DataTypeOne = (props: IProps) => {
     const [data, setData] = useState<IChannelMappingResponse[]>([]);
     const [start, setStart] = useState(0);
     const [setXCategory, setSetXCategory] = useState<string[]>([]);
+    const zoomLevel = useContext(ZoomContext);
 
     const fetchData = async () => {
         const newStart = start + data_limit;
@@ -40,8 +42,8 @@ const DataTypeOne = (props: IProps) => {
                 xAxis: {
                     events: {
                         // afterSetExtremes: syncCharts
-                        setExtremes: function (e: IZoomRange) {
-                            console.log('e', e);
+                        afterSetExtremes: function (e: IZoomRange) {
+                            // console.log('e', e);
                             props.onZoomChange(e.min, e.max);
                         },
                     }
@@ -52,7 +54,12 @@ const DataTypeOne = (props: IProps) => {
         }
     }, [data]);
 
-
+    useEffect(() => {
+        const chart = chartRef.current?.chart;
+        if (chart && zoomLevel) {
+            chart.xAxis[0].setExtremes(zoomLevel.min, zoomLevel.max);
+        }
+    }, [zoomLevel]);
 
     const handlePan = () => {
         fetchData();
@@ -152,7 +159,7 @@ const DataTypeOne = (props: IProps) => {
             }
         },
         scrollbar: {
-            enabled: true // enable the scrollbar
+            enabled: false // enable the scrollbar
         },
         rangeSelector: {
             enabled: false // enable the range selector
