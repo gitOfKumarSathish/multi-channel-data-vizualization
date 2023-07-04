@@ -11,7 +11,7 @@ interface IViewProps {
 
 interface IProps {
     onZoomChange(min: number, max: number): unknown;
-    configs: IViewProps & { chart_title?: any; };
+    configs: IViewProps & { chart_title?: string; };
 }
 
 interface ISample {
@@ -20,7 +20,7 @@ interface ISample {
 }
 
 interface IChannelData {
-    channel: any;
+    channel: string;
     data: number[];
     sr: number;
     ts: number;
@@ -54,11 +54,32 @@ interface IDataElementTypeThree {
     };
 }
 
+interface IChartDataTypeFour {
+    tag(tag?: string): string;
+    bt?: any;
+    tt?: any;
+    x: number;
+    x2: number;
+    y: number;
+    title: string;
+}
+
+interface ISingleChannelData {
+    tag: string;
+    bt: number;
+    tt: number;
+}
+
+interface IChannelDataTypeFour {
+    channel: string;
+    data: IChartDataTypeFour[];
+}
+
 interface IChartData {
-    ts?: any;
+    ts?: number;
     channel: string;
     data: IDataElementTypeThree[];
 }
 
 
-export type { IProps, IViewProps, ISample, IChannelData, IChannelMappingResponse, ISrcChannel, IZoomRange, IDataElement, IDataElementTypeThree, IChartData };
+export type { IProps, IViewProps, ISample, IChannelData, IChannelMappingResponse, ISrcChannel, IZoomRange, IDataElement, IDataElementTypeThree, IChartData, IChartDataTypeFour, IChannelDataTypeFour, ISingleChannelData };

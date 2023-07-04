@@ -6,20 +6,20 @@ import xrange from "highcharts/modules/xrange";
 import HighchartsBoost from 'highcharts/modules/boost';
 import HighchartsStock from 'highcharts/modules/stock'; // import the Highcharts Stock module
 import { ZoomContext } from './Charts';
-import { IProps } from './API/interfaces';
+import { IChannelDataTypeFour, IProps, ISingleChannelData, ISrcChannel, IZoomRange } from './API/interfaces';
 
 HighchartsStock(Highcharts); // initialize the Stock module
 xrange(Highcharts);
 HighchartsBoost(Highcharts);
-let Yaxis: any = [];
+let Yaxis: string[] = [];
 
 const DataTypeFour = (props: IProps) => {
     const { chart_title, chart_type, x_label, y_label, miniMap, data_limit, src_channels } = props.configs;
     const chartRef = useRef<HighchartsReact.Props>(null);
-    const [data, setData] = useState<any>([]);
+    const [data, setData] = useState<IChannelDataTypeFour[]>([]);
     const [start, setStart] = useState(0);
-    const [xAxisCategory, setXAxisCategory] = useState<any>([]);
-    const [plotting, setPlotting] = useState<any>([]);
+    const [xAxisCategory, setXAxisCategory] = useState<string[]>([]);
+    const [plotting, setPlotting] = useState<IChannelDataTypeFour[]>([]);
     const zoomLevel = useContext(ZoomContext);
 
     const fetchData = async () => {
@@ -42,7 +42,7 @@ const DataTypeFour = (props: IProps) => {
                 xAxis: {
                     events: {
                         // afterSetExtremes: syncCharts
-                        afterSetExtremes: function (e: { min: any; max: any; }) {
+                        afterSetExtremes: function (e: IZoomRange) {
                             props.onZoomChange(e.min, e.max);
                         },
                     }
@@ -78,10 +78,9 @@ const DataTypeFour = (props: IProps) => {
             // type: "datetime",
             tickPixelInterval: 100,
             labels: {
-                formatter(this: any): string {
-                    // Convert the timestamp to a date string
-                    return this.value;
-                }
+                formatter(this: Highcharts.AxisLabelsFormatterContextObject): string {
+                    return String(this.value);
+                },
             },
             title: {
                 text: String(x_label),
@@ -96,20 +95,21 @@ const DataTypeFour = (props: IProps) => {
             categories: xAxisCategory
 
         },
-        // tooltip: {
-        //     formatter(this: any): string {
-        //         return `<b>${this.x.toFixed(2) + ' - ' + this.x2.toFixed(2)}</b><br/><b>${this.yCategory}</b>`;
-        //     },
-        // },
-
         tooltip: {
             shared: true,
-            formatter(this: any): string {
-                let tooltip = '<b>' + 'ts : ' + this.x + '</b><br/>';
-                this.points.forEach(function (point: { x: number; x2: number; yCategory: any; }) {
-                    tooltip += `<b>${point.x.toFixed(2) + ' - ' + point.x2.toFixed(2)}</b><br/><b>${point.yCategory}</b>`;
-                });
-                return tooltip;
+            formatter(this: Highcharts.TooltipFormatterContextObject): string {
+                if (this && this.points) {
+                    let tooltip = '<b>' + 'ts : ' + this.x + '</b><br/>';
+                    this.points.forEach(function (point: Highcharts.Point): void {
+                        const x = point.x.toFixed(2);
+                        const x2 = point.x2 != null ? point.x2.toFixed(2) : '';
+                        const yCategory = point?.yCategory !== null ? point.yCategory.toString() : '';
+                        tooltip += `<b>${x} - ${x2}</b><br/><b>${yCategory}</b>`;
+                    });
+                    return tooltip;
+                } else {
+                    return '';
+                }
             }
         },
         legend: {
@@ -151,10 +151,9 @@ const DataTypeFour = (props: IProps) => {
             adaptToUpdatedData: true,
             xAxis: {
                 labels: {
-                    formatter(this: any): string {
-                        // Format the label based on the x-axis value
+                    formatter(this: Highcharts.AxisLabelsFormatterContextObject): string {
                         const xValue = this.value;
-                        return xValue;
+                        return String(xValue);
                     },
                 },
             }
@@ -184,14 +183,12 @@ const DataTypeFour = (props: IProps) => {
 
 export default memo(DataTypeFour);
 
-function dataMapping(data: any, setXAxisCategory: { (value: any): void; (arg0: unknown[]): void; }, setPlotting: { (value: any): void; (arg0: (prevData: any) => any[]): void; }) {
-    let uniqueArray: string | unknown[];
-    data.map((channelData: { data: { bt: number; tt: number; tag(tag: string): unknown; data: any; }[]; }) => {
-        channelData?.data?.map((singleChannelData: {
-            bt: number;
-            tt: number;
-            tag(tag: string): unknown; data: any;
-        }) => {
+function dataMapping(data: any[],
+    setXAxisCategory: (value: string[]) => void,
+    setPlotting: (value: any) => void): void {
+    let uniqueArray: string[] = [];
+    data.map((channelData) => {
+        channelData?.data?.map((singleChannelData: ISingleChannelData) => {
             Yaxis.push(singleChannelData.tag);
             uniqueArray = [...new Set(Yaxis)];
             setXAxisCategory(uniqueArray);
@@ -207,10 +204,9 @@ function dataMapping(data: any, setXAxisCategory: { (value: any): void; (arg0: u
     });
 }
 
-async function channelMapping(src_channels: any, start: number, newStart: any, data: any, setData: { (value: any): void; (arg0: any[]): void; }) {
+async function channelMapping(src_channels: ISrcChannel[], start: number, newStart: number, data: IChannelDataTypeFour[], setData: { (value: IChannelDataTypeFour[]): void; }) {
     const promises = src_channels.map(async (eachChannel: { channel: string; }) => {
         const response = await API.getData(eachChannel.channel, start, newStart);
-        // const seriesData = response.data.map((item: any) => [item.ts, item]);
         return {
             channel: eachChannel.channel,
             data: response.data
@@ -219,8 +215,8 @@ async function channelMapping(src_channels: any, start: number, newStart: any, d
 
     try {
         const responses = await Promise.all(promises);
-        responses?.forEach((response: any) => {
-            const existingChannelIndex = data.findIndex((item: any) => item.channel === response.channel);
+        responses?.forEach((response) => {
+            const existingChannelIndex = data.findIndex((item: { channel: string; }) => item.channel === response.channel);
 
             if (existingChannelIndex !== -1) {
                 data[existingChannelIndex].data = [...data[existingChannelIndex]?.data, ...response.data];
