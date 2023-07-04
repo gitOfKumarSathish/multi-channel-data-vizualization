@@ -13,4 +13,25 @@ interface IProps {
     configs: IViewProps & { chart_title?: any; };
 }
 
-export type { IProps, IViewProps };
+interface ISample {
+    value: number;
+    time: string;
+}
+
+interface IChannelData {
+    data: number[];
+    sr: number;
+    ts: number;
+}
+
+interface IChannelMappingResponse {
+    channel: string;
+    data: IChannelData;
+}
+
+interface ISrcChannel {
+    channel: string;
+    name: string;
+}
+
+export type { IProps, IViewProps, ISample, IChannelData, IChannelMappingResponse, ISrcChannel };
