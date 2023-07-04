@@ -11,6 +11,7 @@ const DataTypeTwo = (props: { configs: { chart_title: string; chart_type: string
     const chartRef = useRef<HighchartsReact.Props>(null);
     const [data, setData] = useState<any>([]);
     const [start, setStart] = useState(0);
+    const [setXCategory, setSetXCategory] = useState<any>([]);
     const zoomLevel = useContext(ZoomContext);
 
     const fetchData = async () => {
@@ -38,17 +39,17 @@ const DataTypeTwo = (props: { configs: { chart_title: string; chart_type: string
             const seriesData = data.map((channelData: any) => {
                 const series = {
                     name: channelData.channel,
-                    data: channelData.data.map((val: any[]) => val[1]),
+                    data: channelData.data.map((val: { value: any; }) => val?.value),
                 };
 
                 return series;
             });
 
             const updatedCategories = data.flatMap((channelData: any) => {
-                return channelData.data.map((val: any[]) => val[0]?.toFixed(2));
+                return channelData.data.map((val: { ts: any; }) => val?.ts);
             });
-
             chart.update({ series: seriesData }, false);
+            setSetXCategory(updatedCategories);
             chart.xAxis[0].setCategories(updatedCategories, false);
             chart.redraw();
 
@@ -64,7 +65,8 @@ const DataTypeTwo = (props: { configs: { chart_title: string; chart_type: string
                 xAxis: {
                     events: {
                         // afterSetExtremes: syncCharts
-                        setExtremes: function (e) {
+                        setExtremes: function (e: { min: any; max: any; }) {
+                            console.log('e', e);
                             props.onZoomChange(e.min, e.max);
                         },
                     }
@@ -73,14 +75,14 @@ const DataTypeTwo = (props: { configs: { chart_title: string; chart_type: string
         }
     }, [data]);
 
-    useEffect(() => {
-        const chart = chartRef.current?.chart;
-        console.log('zoomLevel', zoomLevel);
-        if (chart && zoomLevel) {
-            chart.xAxis[0].setExtremes(zoomLevel.min, zoomLevel.max);
-        }
+    // useEffect(() => {
+    //     const chart = chartRef.current?.chart;
+    //     console.log('zoomLevel', zoomLevel);
+    //     if (chart && zoomLevel) {
+    //         chart.xAxis[0].setExtremes(zoomLevel.min, zoomLevel.max);
+    //     }
 
-    }, [zoomLevel, chartRef.current?.chart]);
+    // }, [zoomLevel, chartRef.current?.chart]);
 
 
     const handlePan = () => {
@@ -114,7 +116,9 @@ const DataTypeTwo = (props: { configs: { chart_title: string; chart_type: string
                 text: String(x_label),
             },
             tickLength: 10,
-            categories: []
+            // categories: [],
+            // categories: x.data.map((y: { value: any; }) => y.value),
+            categories: setXCategory,
         },
         yAxis: {
             lineWidth: 1,
@@ -151,7 +155,7 @@ const DataTypeTwo = (props: { configs: { chart_title: string; chart_type: string
         series: data.map((x: any) => (
             {
 
-                data: x.data.map((x: any[]) => x[0]),
+                data: x.data.map((y: { value: any; }) => y.value),
                 turboThreshold: 100000,
                 pointPadding: 1,
                 groupPadding: 1,
@@ -209,10 +213,10 @@ export default memo(DataTypeTwo);
 async function dataMapping(src_channels: any, start: number, newStart: any, data: any, setData: { (value: any): void; (arg0: any[]): void; }) {
     const promises = src_channels.map(async (eachChannel: { channel: string; }) => {
         const response = await API.getData(eachChannel.channel, start, newStart);
-        const seriesData = response.data.map((item: any) => [item.ts, item.value]);
+        // const seriesData = response.data.map((item: any) => [item.ts, item.value]);
         return {
             channel: eachChannel.channel,
-            data: seriesData
+            data: response.data
         };
     });
 
