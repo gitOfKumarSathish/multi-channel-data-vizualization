@@ -15,6 +15,7 @@ let Yaxis: string[] = [];
 
 const DataTypeFour = (props: IProps) => {
     const { chart_title, chart_type, x_label, y_label, miniMap, data_limit, src_channels } = props.configs;
+    const { minimap, combineZoom } = props.userConfig;
     const chartRef = useRef<HighchartsReact.Props>(null);
     const [data, setData] = useState<IChannelDataTypeFour[]>([]);
     const [start, setStart] = useState(0);
@@ -43,7 +44,9 @@ const DataTypeFour = (props: IProps) => {
                     events: {
                         // afterSetExtremes: syncCharts
                         afterSetExtremes: function (e: IZoomRange) {
-                            props.onZoomChange(e.min, e.max);
+                            if (combineZoom === undefined ? true : combineZoom) {
+                                props.onZoomChange(e.min, e.max);
+                            }
                         },
                     }
                 },
@@ -53,8 +56,8 @@ const DataTypeFour = (props: IProps) => {
 
     useEffect(() => {
         const chart = chartRef.current?.chart;
-        if (chart && zoomLevel) {
-            chart.xAxis[0].setExtremes(zoomLevel.min, zoomLevel.max);
+        if (chart && zoomLevel && combineZoom === undefined ? true : combineZoom) {
+            chart.xAxis[0].setExtremes(zoomLevel?.min, zoomLevel?.max);
         }
     }, [zoomLevel]);
 
@@ -147,7 +150,7 @@ const DataTypeFour = (props: IProps) => {
         ],
 
         navigator: {
-            enabled: Boolean(miniMap), // enable the navigator
+            enabled: Boolean(minimap === undefined ? true : minimap),
             adaptToUpdatedData: true,
             xAxis: {
                 labels: {

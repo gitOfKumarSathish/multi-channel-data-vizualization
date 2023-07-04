@@ -11,6 +11,7 @@ HighchartsStock(Highcharts); // initialize the Stock module
 
 const DataTypeThree = (props: IProps) => {
     const { chart_title, chart_type, x_label, y_label, miniMap, data_limit, src_channels } = props.configs;
+    const { minimap, combineZoom } = props.userConfig;
     const chartRef = useRef<HighchartsReact.Props>(null);
     const [start, setStart] = useState(0);
     const [data, setData] = useState<IChartData[]>([]);
@@ -38,7 +39,9 @@ const DataTypeThree = (props: IProps) => {
                     events: {
                         // afterSetExtremes: syncCharts
                         afterSetExtremes: function (e: IZoomRange) {
-                            props.onZoomChange(e.min, e.max);
+                            if (combineZoom === undefined ? true : combineZoom) {
+                                props.onZoomChange(e.min, e.max);
+                            }
                         },
                     }
                 },
@@ -51,8 +54,8 @@ const DataTypeThree = (props: IProps) => {
 
     useEffect(() => {
         const chart = chartRef.current?.chart;
-        if (chart && zoomLevel) {
-            chart.xAxis[0].setExtremes(zoomLevel.min, zoomLevel.max);
+        if (chart && zoomLevel && combineZoom === undefined ? true : combineZoom) {
+            chart.xAxis[0].setExtremes(zoomLevel?.min, zoomLevel?.max);
         }
     }, [zoomLevel]);
 
@@ -81,7 +84,7 @@ const DataTypeThree = (props: IProps) => {
             },
             labels: {
                 rotation: -10,
-                ormatter(this: Highcharts.AxisLabelsFormatterContextObject): string {
+                formatter(this: Highcharts.AxisLabelsFormatterContextObject): string {
                     // Convert the timestamp to a date string
                     return String(this.value);
                 }
@@ -150,7 +153,7 @@ const DataTypeThree = (props: IProps) => {
             }
         )),
         navigator: {
-            enabled: Boolean(miniMap),
+            enabled: Boolean(minimap === undefined ? true : minimap),
             adaptToUpdatedData: true,
             xAxis: {
                 labels: {

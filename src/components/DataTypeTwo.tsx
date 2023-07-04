@@ -9,6 +9,7 @@ import { IChannelData, IDataElement, IProps, ISrcChannel, IZoomRange } from './A
 HighchartsStock(Highcharts); // initialize the Stock module
 const DataTypeTwo = (props: IProps) => {
     const { chart_title, chart_type, x_label, y_label, miniMap, data_limit, src_channels } = props.configs;
+    const { minimap, combineZoom } = props.userConfig;
     const chartRef = useRef<HighchartsReact.Props>(null);
     const [data, setData] = useState<IChannelData[]>([]);
     const [start, setStart] = useState(0);
@@ -39,7 +40,9 @@ const DataTypeTwo = (props: IProps) => {
                     events: {
                         // afterSetExtremes: syncCharts
                         afterSetExtremes: function (e: IZoomRange) {
-                            props.onZoomChange(e.min, e.max);
+                            if (combineZoom === undefined ? true : combineZoom) {
+                                props.onZoomChange(e.min, e.max);
+                            }
                         },
                     }
                 },
@@ -49,8 +52,8 @@ const DataTypeTwo = (props: IProps) => {
 
     useEffect(() => {
         const chart = chartRef.current?.chart;
-        if (chart && zoomLevel) {
-            chart.xAxis[0].setExtremes(zoomLevel.min, zoomLevel.max);
+        if (chart && zoomLevel && combineZoom === undefined ? true : combineZoom) {
+            chart.xAxis[0].setExtremes(zoomLevel?.min, zoomLevel?.max);
         }
 
     }, [zoomLevel]);
@@ -147,7 +150,7 @@ const DataTypeTwo = (props: IProps) => {
             }
         },
         navigator: {
-            enabled: Boolean(miniMap), // enable the navigator
+            enabled: Boolean(minimap === undefined ? true : minimap),
             adaptToUpdatedData: true,
             xAxis: {
                 labels: {
