@@ -42,7 +42,7 @@ interface IZoomRange {
 }
 
 interface IDataElement {
-    ts: string;
+    ts: number;
     value: number;
 }
 

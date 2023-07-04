@@ -12,7 +12,7 @@ const DataTypeTwo = (props: IProps) => {
     const chartRef = useRef<HighchartsReact.Props>(null);
     const [data, setData] = useState<IChannelData[]>([]);
     const [start, setStart] = useState(0);
-    const [setXCategory, setSetXCategory] = useState<string[]>([]);
+    const [setXCategory, setSetXCategory] = useState<number[]>([]);
     const zoomLevel = useContext(ZoomContext);
 
     const fetchData = async () => {
