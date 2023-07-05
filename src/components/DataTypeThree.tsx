@@ -71,14 +71,9 @@ const DataTypeThree = (props: IProps) => {
             // type: "line",
             type: String(chart_type),
             marginRight: 10,
-            zoomType: "x",
+            zoomType: "xy",
             panning: true,
             panKey: 'shift',
-            events: {
-                load: function (this: any) {
-                    defaultZoomBehavior.call(this);
-                },
-            }
         },
         title: {
             text: String(chart_title),

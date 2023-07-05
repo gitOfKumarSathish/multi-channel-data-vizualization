@@ -71,14 +71,14 @@ const DataTypeTwo = (props: IProps) => {
             type: String(chart_type),
             // animation: Highcharts.svg, // don't animate in old IE
             marginRight: 10,
-            zoomType: "x",
+            zoomType: "xy",
             panning: true,
             panKey: 'shift',
-            events: {
-                load: function (this: any) {
-                    defaultZoomBehavior.call(this);
-                },
-            }
+            // events: {
+            //     load: function (this: any) {
+            //         defaultZoomBehavior.call(this);
+            //     },
+            // }
         },
         title: {
             text: String(chart_title),

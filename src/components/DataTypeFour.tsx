@@ -76,15 +76,11 @@ const DataTypeFour = (props: IProps) => {
             type: String(chart_type),
             // animation: Highcharts.svg, // don't animate in old IE
             marginRight: 10,
-            zoomType: "x",
+            zoomType: "xy",
             panning: true,
-            panKey: 'shift',
-            events: {
-                load: function (this: any) {
-                    defaultZoomBehavior.call(this);
-                },
-            }
+            panKey: 'shift'
         },
+
         title: {
             text: String(chart_title),
         },
@@ -162,6 +158,7 @@ const DataTypeFour = (props: IProps) => {
 
         navigator: {
             enabled: Boolean(minimap === undefined ? true : minimap),
+            // enabled: false,
             adaptToUpdatedData: true,
             xAxis: {
                 labels: {
