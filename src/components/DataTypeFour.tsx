@@ -22,6 +22,7 @@ const DataTypeFour = (props: IProps) => {
     const [xAxisCategory, setXAxisCategory] = useState<string[]>([]);
     const [plotting, setPlotting] = useState<IChannelDataTypeFour[]>([]);
     const zoomLevel = useContext(ZoomContext);
+    const [legendName, setLegendName] = useState<string>('');
 
     const fetchData = async () => {
         const newStart = start + data_limit;
@@ -37,7 +38,7 @@ const DataTypeFour = (props: IProps) => {
     useEffect(() => {
         const chart = chartRef.current?.chart;
         if (chart && data) {
-            dataMapping(data, setXAxisCategory, setPlotting);
+            dataMapping(data, setXAxisCategory, setPlotting, setLegendName);
 
             chart.update({
                 xAxis: {
@@ -130,7 +131,7 @@ const DataTypeFour = (props: IProps) => {
         },
         series: [
             {
-                name: "Random data",
+                name: legendName,
                 data: plotting,
                 turboThreshold: 100000,
                 pointPadding: 1,
@@ -190,9 +191,10 @@ export default memo(DataTypeFour);
 
 function dataMapping(data: any[],
     setXAxisCategory: (value: string[]) => void,
-    setPlotting: (value: any) => void): void {
+    setPlotting: (value: any) => void, setLegendName: (channel: string) => void): void {
     let uniqueArray: string[] = [];
     data.map((channelData) => {
+        console.log('channelData', channelData);
         channelData?.data?.map((singleChannelData: ISingleChannelData) => {
             Yaxis.push(singleChannelData.tag);
             uniqueArray = [...new Set(Yaxis)];
@@ -204,6 +206,7 @@ function dataMapping(data: any[],
                 y: uniqueArray.indexOf(singleChannelData.tag),
                 title: singleChannelData.tag,
             };
+            setLegendName(channelData.channel);
             setPlotting((prevData: any) => [...prevData, chartData]);
         });
     });
