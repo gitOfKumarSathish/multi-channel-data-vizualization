@@ -107,7 +107,7 @@ async function explicitChannelMapping(src_channels: ISrcChannel[], start: number
     }
 };
 
-function settingZoomInGlobalStore(combineZoom: any, e: IZoomRange, props: IProps) {
+function settingZoomInGlobalStore(combineZoom: boolean, e: IZoomRange, props: IProps) {
     if (combineZoom === undefined ? true : combineZoom) { // handling Whether user opted for combineZoom 
         if (e.trigger === 'navigator' || e.trigger === 'zoom') { // Stop unnecessary rendering
             props.onZoomChange(e.min, e.max);
