@@ -10,7 +10,7 @@ import { ZoomContext } from './Charts';
 HighchartsStock(Highcharts); // initialize the Stock module
 
 const DataTypeThree = (props: IProps) => {
-    const { chart_title, chart_type, x_label, y_label, miniMap, data_limit, src_channels } = props.configs;
+    const { chart_title, chart_type, x_label, y_label, miniMap, data_limit, src_channels, plotValue } = props.configs;
     const { minimap, combineZoom } = props.userConfig;
     const chartRef = useRef<HighchartsReact.Props>(null);
     const [start, setStart] = useState(0);
@@ -106,20 +106,30 @@ const DataTypeThree = (props: IProps) => {
             formatter(this: Highcharts.TooltipFormatterContextObject): string {
                 const xValue = this?.x || "";
                 const finalToolTipFormat = data.map((channelData) => {
-                    const correspondingData = channelData.data.find((data: IDataElementTypeThree) => {
+                    const correspondingData = channelData.data.find((data) => {
                         return (data.ts)?.toFixed(2) === xValue.toString();
                     });
                     // Generate the tooltip content using the corresponding data
                     let tooltipContent: string = '';
                     if (correspondingData) {
-                        tooltipContent += `<br/><b>mean: ${correspondingData.values.mean}</b>`;
-                        tooltipContent += `<br/><b>std: ${correspondingData.values.std}</b>`;
-                        tooltipContent += `<br/><b>ts: ${correspondingData.ts}</b>`;
+                        const generateHTML = (obj: any, parentKey = '') => {
+                            let html = '';
+                            for (const key in obj) {
+                                if (typeof obj[key] === 'object') {
+                                    html += generateHTML(obj[key], `${parentKey}${key}.`);
+                                } else {
+                                    html += `<div><b>${key}: ${obj[key]}</b></div> <br/>`;
+                                }
+                            }
+
+                            return html;
+                        };
+                        tooltipContent += generateHTML(correspondingData);
                     }
                     return tooltipContent;
                 });
                 return finalToolTipFormat[0];
-            },
+            }
         },
         legend: {
             enabled: true,
@@ -135,7 +145,7 @@ const DataTypeThree = (props: IProps) => {
         series: data.map((x: IChartData) => (
             {
 
-                data: x.data.map((x: { values: { mean: string; }; }) => x.values.mean),
+                data: x.data.map((x: { values: { [x: string]: string; }; }) => x.values[plotValue]),
                 name: x.channel,
                 turboThreshold: 100000,
                 pointPadding: 1,
