@@ -11,7 +11,7 @@ interface IViewProps {
 
 interface IProps {
     onZoomChange(min: number, max: number): unknown;
-    configs: IViewProps & { chart_title?: string; };
+    configs: IViewProps & { chart_title?: string; plotValue?: string; };
     userConfig: any;
 }
 

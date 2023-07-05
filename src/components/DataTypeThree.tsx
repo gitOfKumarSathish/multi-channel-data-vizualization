@@ -72,7 +72,55 @@ const DataTypeThree = (props: IProps) => {
             marginRight: 10,
             zoomType: "x",
             panning: true,
-            panKey: 'shift'
+            panKey: 'shift',
+            events: {
+                load: function (this: any) {
+                    const chart = this;
+                    const resetZoomButton = chart?.renderer.button(
+                        'Reset Zoom',
+                        null,
+                        null,
+                        function () {
+                            chart.xAxis[0].setExtremes(null, null);
+                            chart.yAxis[0].setExtremes(null, null);
+                        }
+                    )
+                        .attr({
+                            // align: 'right',
+                            'vertical-align': 'top',
+                            y: 65,
+                            x: 0,
+                            zIndex: 9999
+                        })
+                        .addClass('reset-zoom-button')
+                        .add();
+
+                    // Position the button dynamically if the chart width changes
+                    chart.updateResetZoomButtonPosition = function () {
+                        resetZoomButton.attr({
+                            x: chart.chartWidth - resetZoomButton.width - 10
+                        });
+                    };
+
+                    // Update the button position initially and on chart resize
+                    chart.updateResetZoomButtonPosition();
+                    window.addEventListener('resize', chart.updateResetZoomButtonPosition);
+                },
+                // selection: function (event) {
+                //     const chart = this;
+
+                //     if (event.xAxis) {
+                //         // User has zoomed in, show the reset zoom button
+                //         chart.showResetZoomButton();
+                //     } else {
+                //         // User has reset the zoom, hide the reset zoom button
+                //         chart.hideResetZoomButton();
+                //     }
+                // }
+
+
+
+            }
         },
         title: {
             text: String(chart_title),

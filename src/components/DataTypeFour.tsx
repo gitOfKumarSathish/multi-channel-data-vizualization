@@ -68,6 +68,8 @@ const DataTypeFour = (props: IProps) => {
         fetchData();
     };
 
+
+
     const Options = {
         chart: {
             type: String(chart_type),
@@ -75,7 +77,55 @@ const DataTypeFour = (props: IProps) => {
             marginRight: 10,
             zoomType: "x",
             panning: true,
-            panKey: 'shift'
+            panKey: 'shift',
+            events: {
+                load: function (this: any) {
+                    const chart = this;
+                    const resetZoomButton = chart?.renderer.button(
+                        'Reset Zoom',
+                        null,
+                        null,
+                        function () {
+                            chart.xAxis[0].setExtremes(null, null);
+                            chart.yAxis[0].setExtremes(null, null);
+                        }
+                    )
+                        .attr({
+                            // align: 'right',
+                            'vertical-align': 'top',
+                            y: 65,
+                            x: 0,
+                            zIndex: 9999
+                        })
+                        .addClass('reset-zoom-button')
+                        .add();
+
+                    // Position the button dynamically if the chart width changes
+                    chart.updateResetZoomButtonPosition = function () {
+                        resetZoomButton.attr({
+                            x: chart.chartWidth - resetZoomButton.width - 10
+                        });
+                    };
+
+                    // Update the button position initially and on chart resize
+                    chart.updateResetZoomButtonPosition();
+                    window.addEventListener('resize', chart.updateResetZoomButtonPosition);
+                },
+                // selection: function (event) {
+                //     const chart = this;
+
+                //     if (event.xAxis) {
+                //         // User has zoomed in, show the reset zoom button
+                //         chart.showResetZoomButton();
+                //     } else {
+                //         // User has reset the zoom, hide the reset zoom button
+                //         chart.hideResetZoomButton();
+                //     }
+                // }
+
+
+
+            }
         },
         title: {
             text: String(chart_title),
@@ -128,6 +178,39 @@ const DataTypeFour = (props: IProps) => {
         },
         exporting: {
             enabled: true,
+            buttons: {
+                resetZoomButton: {
+                    theme: {
+                        fill: 'white', // Button background color
+                        'stroke-width': 1, // Button border width
+                        stroke: 'silver', // Button border color
+                        r: 0, // Button border radius
+                        style: {
+                            color: '#333', // Button text color
+                        },
+                        states: {
+                            hover: {
+                                fill: '#41739D', // Button background color on hover
+                                style: {
+                                    color: 'white', // Button text color on hover
+                                },
+                            },
+                        },
+                    },
+                    position: {
+                        align: 'right', // Button horizontal alignment
+                        verticalAlign: 'top', // Button vertical alignment
+                        x: 0, // Button x offset
+                        y: -10, // Button y offset
+                    },
+                    text: 'Reset Zoom', // Button text
+                    onclick: function () {
+                        const chart = this;
+                        chart.xAxis[0].setExtremes(null, null); // Reset the x-axis extremes
+                        chart.yAxis[0].setExtremes(null, null); // Reset the y-axis extremes
+                    },
+                },
+            },
         },
         series: [
             {
