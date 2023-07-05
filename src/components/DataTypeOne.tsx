@@ -55,7 +55,7 @@ const DataTypeOne = (props: IProps) => {
                 },
             });
 
-            // chart.redraw();
+            chart.redraw();
         }
     }, [data]);
 
@@ -79,28 +79,28 @@ const DataTypeOne = (props: IProps) => {
             zoomType: "x",
             panning: true,
             panKey: 'shift',
-            resetZoomButton: {
-                position: {
-                    align: 'right',
-                    verticalAlign: 'top',
-                    x: -10,
-                    y: 10
-                },
-                theme: {
-                    fill: 'white',
-                    stroke: 'silver',
-                    r: 0,
-                    states: {
-                        hover: {
-                            fill: '#41739D',
-                            style: {
-                                color: 'white'
-                            }
-                        }
-                    }
-                },
-                relativeTo: 'chart'
-            }
+            // resetZoomButton: {
+            //     position: {
+            //         align: 'right',
+            //         verticalAlign: 'top',
+            //         x: -10,
+            //         y: 10
+            //     },
+            //     theme: {
+            //         fill: 'white',
+            //         stroke: 'silver',
+            //         r: 0,
+            //         states: {
+            //             hover: {
+            //                 fill: '#41739D',
+            //                 style: {
+            //                     color: 'white'
+            //                 }
+            //             }
+            //         }
+            //     },
+            //     relativeTo: 'chart'
+            // }
         },
         title: {
             text: String(chart_title),
@@ -149,8 +149,6 @@ const DataTypeOne = (props: IProps) => {
         },
         series: data.map((channel: IChannelMappingResponse) => (
             {
-                data: channel.data.data,
-                // data: [],
                 name: channel.channel,
                 turboThreshold: 100000,
                 pointPadding: 1,
