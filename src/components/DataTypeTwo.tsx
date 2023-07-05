@@ -5,6 +5,7 @@ import * as API from './API/API';
 import HighchartsStock from 'highcharts/modules/stock'; // import the Highcharts Stock module
 import { ZoomContext } from './Charts';
 import { IChannelData, IDataElement, IProps, ISrcChannel, IZoomRange } from './API/interfaces';
+import { defaultZoomBehavior } from './globalConfigs';
 
 HighchartsStock(Highcharts); // initialize the Stock module
 const DataTypeTwo = (props: IProps) => {
@@ -75,51 +76,8 @@ const DataTypeTwo = (props: IProps) => {
             panKey: 'shift',
             events: {
                 load: function (this: any) {
-                    const chart = this;
-                    const resetZoomButton = chart?.renderer.button(
-                        'Reset Zoom',
-                        null,
-                        null,
-                        function () {
-                            chart.xAxis[0].setExtremes(null, null);
-                            chart.yAxis[0].setExtremes(null, null);
-                        }
-                    )
-                        .attr({
-                            // align: 'right',
-                            'vertical-align': 'top',
-                            y: 65,
-                            x: 0,
-                            zIndex: 9999
-                        })
-                        .addClass('reset-zoom-button')
-                        .add();
-
-                    // Position the button dynamically if the chart width changes
-                    chart.updateResetZoomButtonPosition = function () {
-                        resetZoomButton.attr({
-                            x: chart.chartWidth - resetZoomButton.width - 10
-                        });
-                    };
-
-                    // Update the button position initially and on chart resize
-                    chart.updateResetZoomButtonPosition();
-                    window.addEventListener('resize', chart.updateResetZoomButtonPosition);
+                    defaultZoomBehavior.call(this);
                 },
-                // selection: function (event) {
-                //     const chart = this;
-
-                //     if (event.xAxis) {
-                //         // User has zoomed in, show the reset zoom button
-                //         chart.showResetZoomButton();
-                //     } else {
-                //         // User has reset the zoom, hide the reset zoom button
-                //         chart.hideResetZoomButton();
-                //     }
-                // }
-
-
-
             }
         },
         title: {

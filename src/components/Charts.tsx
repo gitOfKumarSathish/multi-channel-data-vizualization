@@ -31,7 +31,7 @@ export default function Charts() {
     };
     const userConfigurationsTypeTwo = {
         minimap: true,
-        combineZoom: false
+        // combineZoom: false
     };
     const userConfigurationsTypeThree = {
         minimap: true,
@@ -39,7 +39,7 @@ export default function Charts() {
     };
     const userConfigurationsTypeFour = {
         minimap: true,
-        combineZoom: false
+        // combineZoom: false
     };
 
     const chartChannel = () => {
