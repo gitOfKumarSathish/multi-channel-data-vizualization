@@ -6,7 +6,7 @@ import HighchartsStock from 'highcharts/modules/stock'; // import the Highcharts
 import * as API from './API/API';
 import { ZoomContext } from './Charts';
 import { IChannelData, IDataElement, IProps, ISrcChannel, IZoomRange } from './API/interfaces';
-import { defaultZoomBehavior } from './globalConfigs';
+import { defaultZoomBehavior, explicitChannelMapping, settingZoomInGlobalStore, updatingZoomFromGlobalStore } from './globalConfigs';
 
 HighchartsStock(Highcharts); // initialize the module
 const DataTypeTwo = (props: IProps) => {
@@ -25,7 +25,7 @@ const DataTypeTwo = (props: IProps) => {
         const newStart = start + data_limit;
         setStart(newStart);
         // Note: Mapping Data based on src_channels 
-        await channelMapping(src_channels, start, newStart, data, setData);
+        await explicitChannelMapping(src_channels, start, newStart, data, setData);
     };
 
     useEffect(() => {
@@ -49,11 +49,7 @@ const DataTypeTwo = (props: IProps) => {
                     events: {
                         // afterSetExtremes: syncCharts
                         afterSetExtremes: function (e: IZoomRange) {
-                            if (combineZoom === undefined ? true : combineZoom) { // handling Whether user opted for combineZoom 
-                                if (e.trigger === 'navigator' || e.trigger === 'zoom') { // Stop unnecessary rendering
-                                    props.onZoomChange(e.min, e.max); // updating the Zoom level in the Global Store 
-                                }
-                            }
+                            settingZoomInGlobalStore(combineZoom, e, props);
                         },
                     }
                 },
@@ -63,10 +59,7 @@ const DataTypeTwo = (props: IProps) => {
 
     useEffect(() => {
         // updating the Zoom level from the Global Store if any changes are made on other charts
-        const chart = chartRef.current?.chart;
-        if (chart && zoomLevel && combineZoom === undefined ? true : combineZoom) {
-            chart.xAxis[0].setExtremes(zoomLevel?.min, zoomLevel?.max); // update the Zoom level
-        }
+        updatingZoomFromGlobalStore(chartRef, zoomLevel, combineZoom);
 
     }, [zoomLevel]);
 
@@ -205,36 +198,6 @@ const DataTypeTwo = (props: IProps) => {
     );
 };
 
+// type: any 
 export default memo(DataTypeTwo);
 
-async function channelMapping(src_channels: ISrcChannel[], start: number, newStart: number, data: any[], setData: (value: any) => void) {
-    const promises = src_channels.map(async (eachChannel: { channel: string; }) => {
-        /* Note: calling API based on src_channel where key is mentioned as 'channel' */
-        const response = await API.getData(eachChannel.channel, start, newStart);
-        return {
-            channel: eachChannel.channel,
-            data: response.data
-        };
-    });
-
-    try {
-        /* 
-           Mapping the promises output for respective channels, 
-           example: [ { channel: volume, data: [set Of Data]} ,{ channel: temp, data: [set Of Data]}]  
-        */
-        const responses = await Promise.all(promises);
-        responses.forEach((response) => {
-            const existingChannelIndex = data.findIndex((item: { channel: string; }) => item.channel === response.channel);
-            // checking channel is Existing or not  if yes push the new set of data to 'data' array, if not creating a new channel with 'data' array
-            if (existingChannelIndex !== -1) {
-                data[existingChannelIndex].data = [...data[existingChannelIndex].data, ...response.data];
-            } else {
-                data.push(response);
-            }
-        });
-        // setting Data for the Chart
-        setData([...data]);
-    } catch (error) {
-        console.error('Error fetching data:', error);
-    }
-}

@@ -7,7 +7,7 @@ import * as API from './API/API';
 import { IChartData, IDataElementTypeThree, IProps, ISrcChannel, IZoomRange } from './API/interfaces';
 import { useContext } from 'react';
 import { ZoomContext } from './Charts';
-import { defaultZoomBehavior } from './globalConfigs';
+import { defaultZoomBehavior, explicitChannelMapping, settingZoomInGlobalStore, updatingZoomFromGlobalStore } from './globalConfigs';
 
 HighchartsStock(Highcharts); // initialize the module
 
@@ -28,7 +28,7 @@ const DataTypeThree = (props: IProps) => {
         const newStart = start + data_limit;
         setStart(newStart);
         // Note: Mapping Data based on src_channels 
-        await channelMapping(src_channels, start, newStart, data, setData);
+        await explicitChannelMapping(src_channels, start, newStart, data, setData);
     };
 
     useEffect(() => {
@@ -48,11 +48,7 @@ const DataTypeThree = (props: IProps) => {
                     events: {
                         // afterSetExtremes: syncCharts
                         afterSetExtremes: function (e: IZoomRange) {
-                            if (combineZoom === undefined ? true : combineZoom) {  // handling Whether user opted for combineZoom 
-                                if (e.trigger === 'navigator' || e.trigger === 'zoom') {  // Stop unnecessary rendering
-                                    props.onZoomChange(e.min, e.max); // updating the Zoom level in the Global Store 
-                                }
-                            }
+                            settingZoomInGlobalStore(combineZoom, e, props);
                         },
                     }
                 },
@@ -65,10 +61,7 @@ const DataTypeThree = (props: IProps) => {
 
     useEffect(() => {
         // updating the Zoom level from the Global Store if any changes are made on other charts
-        const chart = chartRef.current?.chart;
-        if (chart && zoomLevel && combineZoom === undefined ? true : combineZoom) {
-            chart.xAxis[0].setExtremes(zoomLevel?.min, zoomLevel?.max); // update the Zoom level
-        }
+        updatingZoomFromGlobalStore(chartRef, zoomLevel, combineZoom);
     }, [zoomLevel]);
 
     const handlePan = () => {
@@ -219,10 +212,8 @@ const DataTypeThree = (props: IProps) => {
         </div>
     );
 };
-
+// type: IChartData 
 export default memo(DataTypeThree);
-
-
 
 function dataMapping(data: IChartData[], setSetXCategory: (value: string[]) => void, chart: any) {
     const updatedCategories = data.flatMap((channelData: IChartData) => {
@@ -233,37 +224,4 @@ function dataMapping(data: IChartData[], setSetXCategory: (value: string[]) => v
 
     // chart.update({ series: seriesData }, false);
     // chart.xAxis[0].setCategories(updatedCategories, false);
-}
-
-async function channelMapping(src_channels: ISrcChannel[], start: number, newStart: number, data: IChartData[], setData: (value: IChartData[]) => void) {
-    const promises = src_channels.map(async (eachChannel: { channel: string; }) => {
-        /* Note: calling API based on src_channel where key is mentioned as 'channel' */
-        const response = await API.getData(eachChannel.channel, start, newStart);
-        return {
-            channel: eachChannel.channel,
-            data: response.data
-        };
-    });
-
-    try {
-        /* 
-         Mapping the promises output for respective channels, 
-         example: [{ channel: mixed, data: [set Of Data]}]  
-      */
-        const responses = await Promise.all(promises);
-        responses.forEach((response) => {
-            // checking channel is Existing or not  if yes push the new set of data to 'data' array, if not creating a new channel with 'data' array
-            const existingChannelIndex = data.findIndex((item) => item.channel === response.channel);
-
-            if (existingChannelIndex !== -1) {
-                data[existingChannelIndex].data = [...data[existingChannelIndex].data, ...response.data];
-            } else {
-                data.push(response);
-            }
-        });
-        // setting Data for the Chart
-        setData([...data]);
-    } catch (error) {
-        console.error('Error fetching data:', error);
-    }
 }
