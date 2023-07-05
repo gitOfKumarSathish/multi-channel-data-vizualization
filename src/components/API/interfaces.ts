@@ -38,6 +38,7 @@ interface ISrcChannel {
 }
 
 interface IZoomRange {
+    trigger: string;
     min: number;
     max: number;
 }

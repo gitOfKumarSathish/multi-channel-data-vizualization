@@ -46,7 +46,9 @@ const DataTypeOne = (props: IProps) => {
                         afterSetExtremes: function (e: IZoomRange) {
                             // console.log('e', e);
                             if (combineZoom === undefined ? true : combineZoom) {
-                                props.onZoomChange(e.min, e.max);
+                                if (e.trigger === 'navigator' || e.trigger === 'zoom') {
+                                    props.onZoomChange(e.min, e.max);
+                                }
                             }
                         },
                     }

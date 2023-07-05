@@ -40,7 +40,9 @@ const DataTypeThree = (props: IProps) => {
                         // afterSetExtremes: syncCharts
                         afterSetExtremes: function (e: IZoomRange) {
                             if (combineZoom === undefined ? true : combineZoom) {
-                                props.onZoomChange(e.min, e.max);
+                                if (e.trigger === 'navigator' || e.trigger === 'zoom') {
+                                    props.onZoomChange(e.min, e.max);
+                                }
                             }
                         },
                     }
