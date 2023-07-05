@@ -1,71 +1,87 @@
+import React, { memo, useEffect, useRef, useState } from 'react';
 import HighchartsReact from 'highcharts-react-official';
 import Highcharts from 'highcharts';
-import { memo, useEffect, useRef, useState } from 'react';
-import * as API from './API/API';
 import HighchartsStock from 'highcharts/modules/stock'; // import the Highcharts Stock module
+
+import * as API from './API/API';
 import { IChartData, IDataElementTypeThree, IProps, ISrcChannel, IZoomRange } from './API/interfaces';
 import { useContext } from 'react';
 import { ZoomContext } from './Charts';
 import { defaultZoomBehavior } from './globalConfigs';
 
-HighchartsStock(Highcharts); // initialize the Stock module
+HighchartsStock(Highcharts); // initialize the module
 
 const DataTypeThree = (props: IProps) => {
+    // Props Received from the Charts.tsx component from Backend API
+    /* Note: plotValue will decide which value to plot in yaxis which is coming from backend api */
     const { chart_title, chart_type, x_label, y_label, miniMap, data_limit, src_channels, plotValue } = props.configs;
+    // Props Received from the Charts.tsx component from userConfig
     const { minimap, combineZoom } = props.userConfig;
+    // Create Chart Reference
     const chartRef = useRef<HighchartsReact.Props>(null);
-    const [start, setStart] = useState(0);
-    const [data, setData] = useState<IChartData[]>([]);
-    const [setXCategory, setSetXCategory] = useState<string[]>([]);
+    const [start, setStart] = useState(0); // handling for API from , to counts 
+    const [data, setData] = useState<IChartData[]>([]);  // handling Data for visualization
+    const [setXCategory, setSetXCategory] = useState<string[]>([]);  // handling X-Axis for plotting
     const zoomLevel = useContext(ZoomContext);
 
     const fetchData = async () => {
         const newStart = start + data_limit;
         setStart(newStart);
-
         // Note: Mapping Data based on src_channels 
         await channelMapping(src_channels, start, newStart, data, setData);
     };
 
     useEffect(() => {
+        // when component Loaded respective API from the backend
         fetchData();
     }, []);
 
     useEffect(() => {
+        // Any changes happening data will be called and updated the charts
         const chart = chartRef.current?.chart;
         if (chart) {
-            dataMapping(data, setSetXCategory, chart);
+            dataMapping(data, setSetXCategory, chart); // Mapping the Data based on the data Type
+
+            // Handling Zoom and setting the zoom level in Global Store
             chart.update({
                 xAxis: {
                     events: {
                         // afterSetExtremes: syncCharts
                         afterSetExtremes: function (e: IZoomRange) {
-                            if (combineZoom === undefined ? true : combineZoom) {
-                                if (e.trigger === 'navigator' || e.trigger === 'zoom') {
-                                    props.onZoomChange(e.min, e.max);
+                            if (combineZoom === undefined ? true : combineZoom) {  // handling Whether user opted for combineZoom 
+                                if (e.trigger === 'navigator' || e.trigger === 'zoom') {  // Stop unnecessary rendering
+                                    props.onZoomChange(e.min, e.max); // updating the Zoom level in the Global Store 
                                 }
                             }
                         },
                     }
                 },
             });
-
+            // Re-Draw the chart default behavior of the Highcharts
             chart.redraw();
         }
     }, [data]);
 
 
     useEffect(() => {
+        // updating the Zoom level from the Global Store if any changes are made on other charts
         const chart = chartRef.current?.chart;
         if (chart && zoomLevel && combineZoom === undefined ? true : combineZoom) {
-            chart.xAxis[0].setExtremes(zoomLevel?.min, zoomLevel?.max);
+            chart.xAxis[0].setExtremes(zoomLevel?.min, zoomLevel?.max); // update the Zoom level
         }
     }, [zoomLevel]);
 
     const handlePan = () => {
+        // when LoadMore is clicked calling the next set of data from backend
         fetchData();
     };
 
+    // Chart Options
+    /* 
+        Note: in xAxis.categories are responsible for the x axis data,
+            series are responsible for the y axis data.
+    
+    */
     const options = {
         chart: {
             // type: "line",
@@ -212,14 +228,16 @@ function dataMapping(data: IChartData[], setSetXCategory: (value: string[]) => v
     const updatedCategories = data.flatMap((channelData: IChartData) => {
         return channelData.data.map((val) => val?.ts.toFixed(2));
     });
+    // Update X Axis Data which is ts
     setSetXCategory(updatedCategories);
 
     // chart.update({ series: seriesData }, false);
-    chart.xAxis[0].setCategories(updatedCategories, false);
+    // chart.xAxis[0].setCategories(updatedCategories, false);
 }
 
 async function channelMapping(src_channels: ISrcChannel[], start: number, newStart: number, data: IChartData[], setData: (value: IChartData[]) => void) {
     const promises = src_channels.map(async (eachChannel: { channel: string; }) => {
+        /* Note: calling API based on src_channel where key is mentioned as 'channel' */
         const response = await API.getData(eachChannel.channel, start, newStart);
         return {
             channel: eachChannel.channel,
@@ -228,8 +246,13 @@ async function channelMapping(src_channels: ISrcChannel[], start: number, newSta
     });
 
     try {
+        /* 
+         Mapping the promises output for respective channels, 
+         example: [{ channel: mixed, data: [set Of Data]}]  
+      */
         const responses = await Promise.all(promises);
         responses.forEach((response) => {
+            // checking channel is Existing or not  if yes push the new set of data to 'data' array, if not creating a new channel with 'data' array
             const existingChannelIndex = data.findIndex((item) => item.channel === response.channel);
 
             if (existingChannelIndex !== -1) {
@@ -238,6 +261,7 @@ async function channelMapping(src_channels: ISrcChannel[], start: number, newSta
                 data.push(response);
             }
         });
+        // setting Data for the Chart
         setData([...data]);
     } catch (error) {
         console.error('Error fetching data:', error);

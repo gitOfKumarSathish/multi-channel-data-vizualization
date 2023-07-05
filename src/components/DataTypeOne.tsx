@@ -18,7 +18,7 @@ const DataTypeOne = (props: IProps) => {
     // Create Chart Reference
     const chartRef = useRef<HighchartsReact.Props>(null);
     const [data, setData] = useState<IChannelMappingResponse[]>([]); // handling Data for visualization
-    const [start, setStart] = useState(0); // handling for API counts 
+    const [start, setStart] = useState(0); // handling for API from , to counts 
     const [xCategory, setXCategory] = useState<string[]>([]); // handling X-Axis for plotting
     const zoomLevel = useContext(ZoomContext); // Access Global Properties ZoomLevel
 
