@@ -136,6 +136,7 @@ const DataTypeThree = (props: IProps) => {
             {
 
                 data: x.data.map((x: { values: { mean: string; }; }) => x.values.mean),
+                name: x.channel,
                 turboThreshold: 100000,
                 pointPadding: 1,
                 groupPadding: 1,
@@ -195,21 +196,12 @@ const DataTypeThree = (props: IProps) => {
 export default memo(DataTypeThree);
 
 function dataMapping(data: IChartData[], setSetXCategory: (value: string[]) => void, chart: any) {
-    const seriesData = data.map((channelData: IChartData) => {
-        const series = {
-            name: channelData.channel,
-            data: channelData.data.map((val: IDataElementTypeThree) => val?.values?.mean),
-        };
-
-        return series;
-    });
-
     const updatedCategories = data.flatMap((channelData: IChartData) => {
         return channelData.data.map((val) => val?.ts.toFixed(2));
     });
     setSetXCategory(updatedCategories);
 
-    chart.update({ series: seriesData }, false);
+    // chart.update({ series: seriesData }, false);
     chart.xAxis[0].setCategories(updatedCategories, false);
 }
 
